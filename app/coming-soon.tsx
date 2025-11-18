@@ -2,27 +2,56 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Instagram, Twitter, Mail, CheckCircle2, ChevronDown } from 'lucide-react';
+import { Linkedin, Twitter, Mail, CheckCircle2, ChevronDown, Loader2 } from 'lucide-react';
+import SuccessModal from '@/components/SuccessModal';
 
 export default function ComingSoon() {
   const [email, setEmail] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email) {
-      // Here you would typically send to your email service
-      console.log('Email submitted:', email);
-      setIsSubmitted(true);
-      setTimeout(() => {
+    if (!email) return;
+
+    setIsLoading(true);
+    setErrorMessage('');
+
+    try {
+      const response = await fetch('/api/subscribe', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setIsSubmitted(true);
+        setShowModal(true);
         setEmail('');
-        setIsSubmitted(false);
-      }, 3000);
+
+        // Reset submitted state after modal is closed
+        setTimeout(() => {
+          setIsSubmitted(false);
+        }, 5000);
+      } else {
+        setErrorMessage(data.error || 'Something went wrong. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error submitting email:', error);
+      setErrorMessage('Network error. Please check your connection and try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -113,25 +142,48 @@ export default function ComingSoon() {
                     <input
                       type="email"
                       value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      onChange={(e) => {
+                        setEmail(e.target.value);
+                        setErrorMessage('');
+                      }}
                       placeholder="Enter your email"
                       required
+                      disabled={isLoading}
                       className="flex-1 bg-black/80 backdrop-blur-sm text-white px-6 py-4 sm:py-5
                                border border-[#C59D5F]/30 focus:border-[#D4AF37] outline-none
                                placeholder-gray-600 text-sm sm:text-base tracking-wider
-                               transition-all duration-300"
+                               transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                     />
                     <button
                       type="submit"
+                      disabled={isLoading}
                       className="bg-gradient-to-r from-[#D4AF37] to-[#C59D5F] text-black px-8 sm:px-12 py-4 sm:py-5
                                font-semibold tracking-widest text-sm sm:text-base
                                hover:shadow-[0_0_30px_rgba(212,175,55,0.3)]
-                               transition-all duration-300 uppercase"
+                               transition-all duration-300 uppercase
+                               disabled:opacity-50 disabled:cursor-not-allowed
+                               flex items-center justify-center gap-2"
                     >
-                      Notify Me
+                      {isLoading ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          <span className="hidden sm:inline">Processing</span>
+                        </>
+                      ) : (
+                        'Notify Me'
+                      )}
                     </button>
                   </div>
                 </div>
+                {errorMessage && (
+                  <motion.p
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-red-400 text-xs sm:text-sm mt-3 tracking-wide"
+                  >
+                    {errorMessage}
+                  </motion.p>
+                )}
                 <p className="text-gray-600 text-xs sm:text-sm mt-4 tracking-wide">
                   Be the first to experience luxury redefined
                 </p>
@@ -156,11 +208,13 @@ export default function ComingSoon() {
             className="flex items-center justify-center gap-8 mb-8"
           >
             <a
-              href="#"
+              href="https://www.linkedin.com/company/yagoconcierge"
+              target="_blank"
+              rel="noopener noreferrer"
               className="text-gray-600 hover:text-[#D4AF37] transition-colors duration-300 transform hover:scale-110"
-              aria-label="Instagram"
+              aria-label="LinkedIn"
             >
-              <Instagram className="w-6 h-6" />
+              <Linkedin className="w-6 h-6" />
             </a>
             <a
               href="#"
@@ -213,6 +267,9 @@ export default function ComingSoon() {
       <div className="absolute top-0 right-0 w-32 h-32 border-t-2 border-r-2 border-[#C59D5F]/20" />
       <div className="absolute bottom-0 left-0 w-32 h-32 border-b-2 border-l-2 border-[#C59D5F]/20" />
       <div className="absolute bottom-0 right-0 w-32 h-32 border-b-2 border-r-2 border-[#C59D5F]/20" />
+
+      {/* Success Modal */}
+      <SuccessModal isOpen={showModal} onClose={() => setShowModal(false)} />
     </div>
   );
 }
