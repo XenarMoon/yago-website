@@ -104,21 +104,21 @@ export default function SuccessModal({ isOpen, onClose }: SuccessModalProps) {
                   className="space-y-4"
                 >
                   <p className="text-gray-300 text-base sm:text-lg leading-relaxed">
-                    You've successfully joined our exclusive waitlist!
+                    You&apos;ve successfully joined our exclusive waitlist!
                   </p>
                   <p className="text-gray-400 text-sm sm:text-base leading-relaxed">
-                    As an early bird, you'll receive{' '}
+                    As an early bird, you&apos;ll receive{' '}
                     <span className="text-[#D4AF37] font-semibold">
                       first access
                     </span>{' '}
-                    to Yago's premium concierge services and{' '}
+                    to Yago&apos;s premium concierge services and{' '}
                     <span className="text-[#D4AF37] font-semibold">
                       exclusive benefits
                     </span>{' '}
                     reserved for our founding members.
                   </p>
                   <p className="text-gray-500 text-sm">
-                    We'll notify you as soon as we launch.
+                    We&apos;ll notify you as soon as we launch.
                   </p>
                 </motion.div>
 
