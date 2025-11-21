@@ -30,210 +30,114 @@ export async function sendWelcomeEmail({ email, firstName }: WelcomeEmailParams)
       from: `Yago Concierge <hello@${process.env.MAILGUN_DOMAIN}>`,
       to: email,
       'h:Reply-To': 'hello@yago.co.uz',
-      'h:List-Unsubscribe': '<mailto:unsubscribe@yago.co.uz>, <https://yago.co.uz/unsubscribe>',
-      'h:X-Mailer': 'Yago Concierge',
-      'h:Precedence': 'bulk',
-      subject: 'Welcome to Yago - Your Exclusive Journey Begins',
+      subject: 'Yago Premium Kutish Ro\'yxatiga xush kelibsiz',
       html: `
         <!DOCTYPE html>
-        <html>
+        <html lang="uz">
         <head>
           <meta charset="utf-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Welcome to Yago</title>
         </head>
-        <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif; background-color: #0A0A0A;">
-          <table width="100%" cellpadding="0" cellspacing="0" style="background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);">
+        <body style="margin: 0; padding: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f8f9fa;">
+          <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f8f9fa; padding: 40px 20px;">
             <tr>
-              <td align="center" style="padding: 60px 20px;">
-                <table width="600" cellpadding="0" cellspacing="0" style="background-color: #000000; box-shadow: 0 20px 60px rgba(255, 107, 90, 0.15);">
-                  <!-- Premium Header -->
-                  <tr>
-                    <td align="center" style="padding: 60px 40px 40px 40px; background: linear-gradient(180deg, #0A0A0A 0%, #000000 100%);">
-                      <div style="margin-bottom: 30px;">
-                        <h1 style="margin: 0; font-size: 72px; font-weight: 900; color: #FF6B5A; letter-spacing: 12px; font-family: Arial Black, sans-serif; text-transform: uppercase;">
-                          YAGO
-                        </h1>
-                      </div>
-                      <div style="height: 3px; background: linear-gradient(to right, transparent, #FF6B5A, #D4AF37, #FF6B5A, transparent); margin: 0 auto; width: 80%; opacity: 0.6;"></div>
-                      <p style="margin: 25px 0 0 0; color: #D4AF37; font-size: 13px; letter-spacing: 4px; text-transform: uppercase; font-weight: 600;">
-                        Luxury Concierge Services
-                      </p>
-                    </td>
-                  </tr>
+              <td align="center">
+                <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);">
 
-                  <!-- Welcome Message -->
+                  <!-- Header with Logo -->
                   <tr>
-                    <td style="padding: 50px 50px 30px 50px; text-align: center;">
-                      <h2 style="margin: 0 0 15px 0; color: #FFFFFF; font-size: 32px; font-weight: 300; letter-spacing: 1px;">
-                        Welcome, <span style="color: #FF6B5A; font-weight: 600;">${recipientName}</span>
-                      </h2>
-                      <p style="margin: 0; color: #999999; font-size: 15px; letter-spacing: 0.5px;">
-                        You've joined an exclusive circle
-                      </p>
+                    <td style="padding: 48px 48px 32px 48px; text-align: center; border-bottom: 1px solid #f0f0f0;">
+                      <img src="https://yago.co.uz/logo.png" alt="YAGO" width="140" style="display: block; margin: 0 auto;">
                     </td>
                   </tr>
 
                   <!-- Main Content -->
                   <tr>
-                    <td style="padding: 0 50px 40px 50px;">
-                      <div style="height: 1px; background: linear-gradient(to right, transparent 0%, #FF6B5A 20%, #D4AF37 50%, #FF6B5A 80%, transparent 100%); margin-bottom: 40px; opacity: 0.3;"></div>
-
-                      <p style="color: #CCCCCC; font-size: 17px; line-height: 1.8; margin: 0 0 30px 0; text-align: center;">
-                        Thank you for expressing interest in <strong style="color: #FF6B5A;">Yago</strong>. You've taken the first step toward experiencing luxury concierge services redefined.
+                    <td style="padding: 40px 48px;">
+                      <p style="font-size: 18px; line-height: 1.7; color: #1a1a1a; margin: 0 0 24px 0;">
+                        Assalomu alaykum,
                       </p>
 
-                      <!-- Benefits Card -->
-                      <div style="background: linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%); border: 1px solid #FF6B5A; border-radius: 8px; padding: 35px; margin: 40px 0;">
-                        <div style="text-align: center; margin-bottom: 25px;">
-                          <div style="display: inline-block; background: linear-gradient(90deg, #FF6B5A, #D4AF37); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
-                            <h3 style="margin: 0; font-size: 24px; font-weight: 700; letter-spacing: 2px;">
-                              EARLY BIRD BENEFITS
-                            </h3>
-                          </div>
-                          <div style="height: 2px; background: linear-gradient(to right, transparent, #FF6B5A, transparent); width: 60%; margin: 15px auto;"></div>
-                        </div>
+                      <p style="font-size: 16px; line-height: 1.8; color: #333333; margin: 0 0 24px 0;">
+                        Yagoga bo'lgan qiziqishingiz uchun chin dildan minnatdorchilik bildiramiz. Siz endi Yago'ning <strong style="color: #E85D4C;">Premium Kutish Ro'yxati</strong>ga qo'shildingiz — va bu sizga eng birinchi bo'lib eksklyuziv imkoniyatlardan foydalanish huquqini beradi.
+                      </p>
 
-                        <table width="100%" cellpadding="0" cellspacing="0">
-                          <tr>
-                            <td style="padding: 12px 0;">
-                              <div style="display: flex; align-items: center;">
-                                <span style="color: #FF6B5A; font-size: 20px; margin-right: 15px;">✦</span>
-                                <p style="margin: 0; color: #E5E5E5; font-size: 15px; line-height: 1.6;">
-                                  <strong style="color: #D4AF37;">Priority Access</strong> to our premium concierge services
-                                </p>
-                              </div>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td style="padding: 12px 0;">
-                              <div style="display: flex; align-items: center;">
-                                <span style="color: #FF6B5A; font-size: 20px; margin-right: 15px;">✦</span>
-                                <p style="margin: 0; color: #E5E5E5; font-size: 15px; line-height: 1.6;">
-                                  <strong style="color: #D4AF37;">Exclusive Discounts</strong> reserved for founding members
-                                </p>
-                              </div>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td style="padding: 12px 0;">
-                              <div style="display: flex; align-items: center;">
-                                <span style="color: #FF6B5A; font-size: 20px; margin-right: 15px;">✦</span>
-                                <p style="margin: 0; color: #E5E5E5; font-size: 15px; line-height: 1.6;">
-                                  <strong style="color: #D4AF37;">First Notification</strong> when we officially launch
-                                </p>
-                              </div>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td style="padding: 12px 0;">
-                              <div style="display: flex; align-items: center;">
-                                <span style="color: #FF6B5A; font-size: 20px; margin-right: 15px;">✦</span>
-                                <p style="margin: 0; color: #E5E5E5; font-size: 15px; line-height: 1.6;">
-                                  <strong style="color: #D4AF37;">Complimentary Consultation</strong> with our concierge team
-                                </p>
-                              </div>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td style="padding: 12px 0;">
-                              <div style="display: flex; align-items: center;">
-                                <span style="color: #FF6B5A; font-size: 20px; margin-right: 15px;">✦</span>
-                                <p style="margin: 0; color: #E5E5E5; font-size: 15px; line-height: 1.6;">
-                                  <strong style="color: #D4AF37;">VIP Treatment</strong> for all your service requests
-                                </p>
-                              </div>
-                            </td>
-                          </tr>
+                      <!-- Features Box -->
+                      <div style="background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%); border-left: 4px solid #E85D4C; border-radius: 0 8px 8px 0; padding: 28px 32px; margin: 32px 0;">
+                        <p style="font-size: 15px; font-weight: 600; color: #1a1a1a; margin: 0 0 20px 0; text-transform: uppercase; letter-spacing: 1px;">
+                          Yago — bu:
+                        </p>
+                        <table cellpadding="0" cellspacing="0" width="100%">
+                          <tr><td style="padding: 8px 0; font-size: 15px; color: #444444; line-height: 1.6;">✨ Shaxsiy AI-konsierj</td></tr>
+                          <tr><td style="padding: 8px 0; font-size: 15px; color: #444444; line-height: 1.6;">✨ Restoran, mehmonxona, transport va tadbirlar bo'yicha 24/7 yordam</td></tr>
+                          <tr><td style="padding: 8px 0; font-size: 15px; color: #444444; line-height: 1.6;">✨ Premium xizmat — Dubai & London darajasida</td></tr>
+                          <tr><td style="padding: 8px 0; font-size: 15px; color: #444444; line-height: 1.6;">✨ Faqat siz uchun moslashtirilgan tavsiyalar</td></tr>
+                          <tr><td style="padding: 8px 0; font-size: 15px; color: #444444; line-height: 1.6;">✨ Real agentlar bilan tezkor aloqa</td></tr>
+                          <tr><td style="padding: 8px 0; font-size: 15px; color: #444444; line-height: 1.6;">✨ Maxfiylik va xavfsizlikning eng yuqori darajasi</td></tr>
                         </table>
                       </div>
 
-                      <p style="color: #AAAAAA; font-size: 16px; line-height: 1.8; margin: 35px 0; text-align: center;">
-                        We're crafting an unparalleled experience in luxury lifestyle management. You'll be among the first to know when we launch.
+                      <p style="font-size: 16px; line-height: 1.8; color: #333333; margin: 0 0 24px 0;">
+                        Biz hozirda Yagoni yakuniy sinovdan o'tkazmoqdamiz. Platforma ishga tushirilishi bilanoq, siz:
                       </p>
 
-                      <!-- CTA Button -->
-                      <div style="text-align: center; margin: 45px 0;">
-                        <a href="https://www.linkedin.com/company/yagoconcierge"
-                           style="display: inline-block; background: linear-gradient(135deg, #FF6B5A 0%, #D4AF37 100%);
-                                  color: #000000; text-decoration: none; padding: 18px 50px;
-                                  font-weight: 700; font-size: 14px; letter-spacing: 3px; text-transform: uppercase;
-                                  border-radius: 50px; box-shadow: 0 10px 30px rgba(255, 107, 90, 0.3);
-                                  transition: all 0.3s ease;">
-                          STAY CONNECTED
-                        </a>
+                      <!-- Benefits -->
+                      <table cellpadding="0" cellspacing="0" width="100%" style="margin: 0 0 28px 0;">
+                        <tr>
+                          <td style="padding: 12px 16px; background-color: #fff8f7; border-radius: 6px; margin-bottom: 8px;">
+                            <span style="color: #E85D4C; font-weight: 700;">●</span>
+                            <span style="font-size: 15px; color: #333333; margin-left: 8px;"><strong>Eng birinchi bo'lib</strong> kirish imkoniga ega bo'lasiz</span>
+                          </td>
+                        </tr>
+                        <tr><td style="height: 8px;"></td></tr>
+                        <tr>
+                          <td style="padding: 12px 16px; background-color: #fff8f7; border-radius: 6px;">
+                            <span style="color: #E85D4C; font-weight: 700;">●</span>
+                            <span style="font-size: 15px; color: #333333; margin-left: 8px;">Eksklyuziv <strong>Founders Access</strong> sovg'alariga ega bo'lasiz</span>
+                          </td>
+                        </tr>
+                        <tr><td style="height: 8px;"></td></tr>
+                        <tr>
+                          <td style="padding: 12px 16px; background-color: #fff8f7; border-radius: 6px;">
+                            <span style="color: #E85D4C; font-weight: 700;">●</span>
+                            <span style="font-size: 15px; color: #333333; margin-left: 8px;">Maxsus <strong>Cheklangan Premium Funksiyalarni</strong> birinchi bo'lib sinab ko'rasiz</span>
+                          </td>
+                        </tr>
+                      </table>
+
+                      <p style="font-size: 16px; line-height: 1.8; color: #333333; margin: 0 0 32px 0;">
+                        Bu orada, sizning qiziqishingiz biz uchun juda muhim. Agar savollaringiz bo'lsa — bemalol bizga murojaat qiling.
+                      </p>
+
+                      <!-- Signature -->
+                      <div style="border-top: 1px solid #eee; padding-top: 28px;">
+                        <p style="font-size: 16px; color: #333333; margin: 0 0 4px 0;">
+                          Hurmat bilan,
+                        </p>
+                        <p style="font-size: 17px; font-weight: 700; color: #E85D4C; margin: 0 0 8px 0;">
+                          Yago Concierge
+                        </p>
+                        <p style="font-size: 13px; color: #888888; margin: 0; font-style: italic;">
+                          Natex Labs tomonidan yaratilgan Premium AI Konsierj
+                        </p>
                       </div>
-
-                      <div style="height: 1px; background: linear-gradient(to right, transparent, #333333, transparent); margin: 40px 0;"></div>
-
-                      <p style="color: #666666; font-size: 13px; text-align: center; margin: 0; font-style: italic; letter-spacing: 1px;">
-                        Crafted with Excellence, Delivered with Passion
-                      </p>
                     </td>
                   </tr>
 
                   <!-- Footer -->
                   <tr>
-                    <td style="padding: 45px 50px; text-align: center; background: linear-gradient(180deg, #000000 0%, #0A0A0A 100%); border-top: 1px solid #222222;">
-                      <!-- Social Links -->
-                      <div style="margin-bottom: 30px;">
-                        <p style="color: #888888; font-size: 13px; margin: 0 0 20px 0; letter-spacing: 1px;">
-                          CONNECT WITH US
-                        </p>
-                        <div style="display: inline-block;">
-                          <a href="https://www.linkedin.com/company/yagoconcierge" style="display: inline-block; margin: 0 12px; text-decoration: none;">
-                            <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #FF6B5A, #D4AF37); display: flex; align-items: center; justify-content: center;">
-                              <span style="color: #000000; font-weight: bold; font-size: 16px;">in</span>
-                            </div>
-                          </a>
-                          <a href="https://twitter.com/yagoconcierge" style="display: inline-block; margin: 0 12px; text-decoration: none;">
-                            <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #FF6B5A, #D4AF37); display: flex; align-items: center; justify-content: center;">
-                              <span style="color: #000000; font-weight: bold; font-size: 16px;">𝕏</span>
-                            </div>
-                          </a>
-                          <a href="mailto:hello@yago.co.uz" style="display: inline-block; margin: 0 12px; text-decoration: none;">
-                            <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #FF6B5A, #D4AF37); display: flex; align-items: center; justify-content: center;">
-                              <span style="color: #000000; font-weight: bold; font-size: 16px;">✉</span>
-                            </div>
-                          </a>
-                        </div>
-                      </div>
-
-                      <div style="height: 1px; background: linear-gradient(to right, transparent, #333333, transparent); margin: 30px auto; width: 60%;"></div>
-
-                      <!-- Company Info -->
-                      <div style="margin: 25px 0;">
-                        <p style="margin: 0 0 8px 0;">
-                          <span style="font-size: 28px; font-weight: 900; color: #FF6B5A; letter-spacing: 6px; font-family: Arial Black, sans-serif;">YAGO</span>
-                        </p>
-                        <p style="color: #666666; font-size: 11px; margin: 0; letter-spacing: 2px; text-transform: uppercase;">
-                          Luxury Concierge Services
-                        </p>
-                      </div>
-
-                      <div style="margin: 25px 0;">
-                        <p style="color: #555555; font-size: 12px; margin: 0 0 5px 0;">
-                          © ${new Date().getFullYear()} Yago Concierge. All rights reserved.
-                        </p>
-                        <p style="color: #444444; font-size: 11px; margin: 0; line-height: 1.6;">
-                          You're receiving this email because you signed up for early access at yago.co.uz
-                        </p>
-                      </div>
-
-                      <div style="margin-top: 25px; padding: 20px; background-color: #0f0f0f; border-radius: 4px;">
-                        <p style="color: #888888; font-size: 11px; margin: 0 0 10px 0; line-height: 1.6;">
-                          This is a one-time welcome email. You'll only hear from us when we officially launch.
-                        </p>
-                        <p style="color: #666666; font-size: 10px; margin: 0; line-height: 1.6;">
-                          <a href="https://yago.co.uz/privacy" style="color: #888888; text-decoration: none;">Privacy Policy</a>
-                          <span style="color: #444444;"> • </span>
-                          <a href="https://yago.co.uz/terms" style="color: #888888; text-decoration: none;">Terms</a>
-                          <span style="color: #444444;"> • </span>
-                          <a href="mailto:unsubscribe@yago.co.uz?subject=Unsubscribe" style="color: #888888; text-decoration: none;">Unsubscribe</a>
-                        </p>
-                      </div>
+                    <td style="padding: 32px 48px; background-color: #1a1a1a; text-align: center;">
+                      <p style="font-size: 13px; color: #999999; margin: 0 0 16px 0;">
+                        <a href="https://yago.co.uz" style="color: #E85D4C; text-decoration: none;">yago.co.uz</a>
+                        <span style="color: #444;"> · </span>
+                        <a href="mailto:hello@yago.co.uz" style="color: #999999; text-decoration: none;">hello@yago.co.uz</a>
+                      </p>
+                      <p style="font-size: 11px; color: #666666; margin: 0;">
+                        © ${new Date().getFullYear()} Yago Concierge. Barcha huquqlar himoyalangan.
+                      </p>
                     </td>
                   </tr>
+
                 </table>
               </td>
             </tr>
@@ -241,44 +145,36 @@ export async function sendWelcomeEmail({ email, firstName }: WelcomeEmailParams)
         </body>
         </html>
       `,
-      text: `
-═══════════════════════════════════════
-          Y A G O
-    Luxury Concierge Services
-═══════════════════════════════════════
+      text: `Assalomu alaykum,
 
-Welcome, ${recipientName}!
+Yagoga bo'lgan qiziqishingiz uchun chin dildan minnatdorchilik bildiramiz.
+Siz endi Yago'ning Premium Kutish Ro'yxatiga qo'shildingiz — va bu sizga eng birinchi bo'lib eksklyuziv imkoniyatlardan foydalanish huquqini beradi.
 
-You've joined an exclusive circle.
+Yago — bu:
+- Shaxsiy AI-konsierj
+- Restoran, mehmonxona, transport va tadbirlar bo'yicha 24/7 yordam
+- Premium xizmat — Dubai & London darajasida
+- Faqat siz uchun moslashtirilgan tavsiyalar
+- Real agentlar bilan tezkor aloqa
+- Maxfiylik va xavfsizlikning eng yuqori darajasi
 
-Thank you for expressing interest in Yago. You've taken the first step toward experiencing luxury concierge services redefined.
+Biz hozirda Yagoni yakuniy sinovdan o'tkazmoqdamiz.
+Platforma ishga tushirilishi bilanoq, siz:
 
-───────────────────────────────────────
-    EARLY BIRD BENEFITS
-───────────────────────────────────────
+- Eng birinchi bo'lib kirish imkoniga ega bo'lasiz
+- Eksklyuziv Founders Access sovg'alariga ega bo'lasiz
+- Maxsus Cheklangan Premium Funksiyalarni birinchi bo'lib sinab ko'rasiz
 
-✦ Priority Access to our premium concierge services
-✦ Exclusive Discounts reserved for founding members
-✦ First Notification when we officially launch
-✦ Complimentary Consultation with our concierge team
-✦ VIP Treatment for all your service requests
+Bu orada, sizning qiziqishingiz biz uchun juda muhim.
+Agar savollaringiz bo'lsa — bemalol bizga murojaat qiling.
 
-We're crafting an unparalleled experience in luxury lifestyle management. You'll be among the first to know when we launch.
+Hurmat bilan,
+Yago Concierge
+Natex Labs tomonidan yaratilgan Premium AI Konsierj
 
-───────────────────────────────────────
-
-STAY CONNECTED
-https://www.linkedin.com/company/yagoconcierge
-
-───────────────────────────────────────
-
-Crafted with Excellence, Delivered with Passion
-
-© ${new Date().getFullYear()} Yago Concierge. All rights reserved.
-You're receiving this email because you signed up for early access at yago.co.uz
-
-Privacy Policy | Terms of Service | Unsubscribe
-      `,
+---
+yago.co.uz · hello@yago.co.uz
+`,
     };
 
     const response = await mg.messages.create(process.env.MAILGUN_DOMAIN, emailData);

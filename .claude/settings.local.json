@@ -26,7 +26,15 @@
       "Bash(git push:*)",
       "Bash(tasklist:*)",
       "Bash(.env.local)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(vercel pull:*)",
+      "Bash(git remote set-url:*)",
+      "Bash(changes.patch)",
+      "Bash(claude update:*)",
+      "Bash(vercel link:*)",
+      "Bash(vercel domains add:*)",
+      "Bash(npm i:*)",
+      "Bash(vercel --yes:*)"
     ],
     "deny": [],
     "ask": []

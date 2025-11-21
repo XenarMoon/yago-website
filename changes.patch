@@ -1,0 +1,3092 @@
+diff --git a/.claude/settings.local.json b/.claude/settings.local.json
+index 9f887ed..bfb07f5 100644
+--- a/.claude/settings.local.json
++++ b/.claude/settings.local.json
+@@ -15,7 +15,18 @@
+       "Bash(vercel --version:*)",
+       "Bash(git init:*)",
+       "Bash(git add:*)",
+-      "Bash(git commit:*)"
++      "Bash(git commit:*)",
++      "Bash(vercel --prod:*)",
++      "Bash(vercel login:*)",
++      "Bash(vercel --yes --prod:*)",
++      "Bash(vercel deploy:*)",
++      "Bash(gh --version:*)",
++      "Bash(git remote add:*)",
++      "Bash(git branch:*)",
++      "Bash(git push:*)",
++      "Bash(tasklist:*)",
++      "Bash(.env.local)",
++      "Bash(curl:*)"
+     ],
+     "deny": [],
+     "ask": []
+diff --git a/.env.example b/.env.example
+index 96d67f2..18057ee 100644
+--- a/.env.example
++++ b/.env.example
+@@ -7,7 +7,12 @@ NEXT_PUBLIC_SITE_NAME=Yago
+ 
+ # Contact Form (Optional - for future implementation)
+ # CONTACT_EMAIL=hello@yago.com
+-# SENDGRID_API_KEY=
++
++# Mailgun Email Service (for welcome emails)
++# Get your API key from: https://app.mailgun.com/settings/api_security
++MAILGUN_API_KEY=your_mailgun_api_key_here
++# Your Mailgun domain (e.g., mg.yourdomain.com or sandbox123.mailgun.org)
++MAILGUN_DOMAIN=your_mailgun_domain_here
+ 
+ # Feature Flags (Optional)
+ # NEXT_PUBLIC_ENABLE_CHAT=false
+diff --git a/.gitignore b/.gitignore
+index 45c1abc..aa6b813 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -34,3 +34,8 @@ yarn-error.log*
+ # typescript
+ *.tsbuildinfo
+ next-env.d.ts
++
++# subscriber data
++/data
++
++.vercel
+diff --git a/DATABASE_MIGRATION.md b/DATABASE_MIGRATION.md
+new file mode 100644
+index 0000000..32a94a4
+--- /dev/null
++++ b/DATABASE_MIGRATION.md
+@@ -0,0 +1,514 @@
++# Database Migration Guide
++
++This guide will help you migrate from the JSON file storage to a proper database (PostgreSQL or MongoDB) when you're ready to scale.
++
++## Current Setup
++
++Currently, subscriber emails are stored in `data/subscribers.json`. This is suitable for:
++- Development and testing
++- Low traffic (< 1000 subscribers)
++- Simple deployments
++
++## When to Migrate
++
++Consider migrating to a database when:
++- You have more than 1000 subscribers
++- You need better query performance
++- You want to add more subscriber fields (name, preferences, etc.)
++- You're deploying to multiple servers
++- You need better data integrity and backups
++
++---
++
++## Option 1: PostgreSQL with Prisma
++
++PostgreSQL is recommended for production-grade applications with strong data integrity requirements.
++
++### Step 1: Install Dependencies
++
++```bash
++npm install @prisma/client
++npm install -D prisma
++```
++
++### Step 2: Initialize Prisma
++
++```bash
++npx prisma init
++```
++
++### Step 3: Configure Database
++
++Update `.env`:
++```env
++DATABASE_URL="postgresql://user:password@localhost:5432/yago?schema=public"
++```
++
++For Vercel deployment, use Vercel Postgres or Supabase.
++
++### Step 4: Create Schema
++
++Create `prisma/schema.prisma`:
++
++```prisma
++generator client {
++  provider = "prisma-client-js"
++}
++
++datasource db {
++  provider = "postgresql"
++  url      = env("DATABASE_URL")
++}
++
++model Subscriber {
++  id           String   @id @default(cuid())
++  email        String   @unique
++  subscribedAt DateTime @default(now())
++  firstName    String?
++  lastName     String?
++  source       String?  @default("website")
++  emailSent    Boolean  @default(false)
++
++  @@index([email])
++  @@index([subscribedAt])
++}
++```
++
++### Step 5: Run Migration
++
++```bash
++npx prisma migrate dev --name init
++npx prisma generate
++```
++
++### Step 6: Create Database Service
++
++Create `lib/db.ts`:
++
++```typescript
++import { PrismaClient } from '@prisma/client';
++
++const globalForPrisma = global as unknown as { prisma: PrismaClient };
++
++export const prisma =
++  globalForPrisma.prisma ||
++  new PrismaClient({
++    log: ['query'],
++  });
++
++if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
++```
++
++### Step 7: Update API Route
++
++Update `app/api/subscribe/route.ts`:
++
++```typescript
++import { prisma } from '@/lib/db';
++import { sendWelcomeEmail } from '@/lib/mailgun';
++
++export async function POST(request: NextRequest) {
++  try {
++    const { email } = await request.json();
++
++    // Validate email
++    const trimmedEmail = email.trim().toLowerCase();
++
++    // Check if email already exists
++    const existingSubscriber = await prisma.subscriber.findUnique({
++      where: { email: trimmedEmail },
++    });
++
++    if (existingSubscriber) {
++      return NextResponse.json(
++        { message: 'You are already subscribed!', alreadySubscribed: true },
++        { status: 200 }
++      );
++    }
++
++    // Create new subscriber
++    const subscriber = await prisma.subscriber.create({
++      data: {
++        email: trimmedEmail,
++      },
++    });
++
++    // Send welcome email
++    sendWelcomeEmail({ email: trimmedEmail }).catch((error) => {
++      console.error('Failed to send welcome email:', error);
++    });
++
++    return NextResponse.json(
++      { message: 'Successfully subscribed!', success: true },
++      { status: 201 }
++    );
++  } catch (error) {
++    console.error('Error in subscribe API:', error);
++    return NextResponse.json(
++      { error: 'Internal server error' },
++      { status: 500 }
++    );
++  }
++}
++
++export async function GET() {
++  try {
++    const subscribers = await prisma.subscriber.findMany({
++      orderBy: { subscribedAt: 'desc' },
++    });
++
++    return NextResponse.json(
++      { count: subscribers.length, subscribers },
++      { status: 200 }
++    );
++  } catch (error) {
++    console.error('Error fetching subscribers:', error);
++    return NextResponse.json(
++      { error: 'Internal server error' },
++      { status: 500 }
++    );
++  }
++}
++```
++
++### Step 8: Migrate Existing Data
++
++Create a migration script `scripts/migrate-to-postgres.ts`:
++
++```typescript
++import { PrismaClient } from '@prisma/client';
++import { promises as fs } from 'fs';
++import path from 'path';
++
++const prisma = new PrismaClient();
++
++async function migrate() {
++  const dataFile = path.join(process.cwd(), 'data', 'subscribers.json');
++  const data = await fs.readFile(dataFile, 'utf-8');
++  const subscribers = JSON.parse(data);
++
++  console.log(`Migrating ${subscribers.length} subscribers...`);
++
++  for (const sub of subscribers) {
++    await prisma.subscriber.upsert({
++      where: { email: sub.email },
++      update: {},
++      create: {
++        email: sub.email,
++        subscribedAt: new Date(sub.subscribedAt),
++      },
++    });
++  }
++
++  console.log('Migration complete!');
++}
++
++migrate()
++  .then(async () => {
++    await prisma.$disconnect();
++  })
++  .catch(async (e) => {
++    console.error(e);
++    await prisma.$disconnect();
++    process.exit(1);
++  });
++```
++
++Run migration:
++```bash
++npx ts-node scripts/migrate-to-postgres.ts
++```
++
++---
++
++## Option 2: MongoDB with Mongoose
++
++MongoDB is great for flexibility and rapid iteration.
++
++### Step 1: Install Dependencies
++
++```bash
++npm install mongoose
++```
++
++### Step 2: Configure Database
++
++Update `.env`:
++```env
++MONGODB_URI="mongodb://localhost:27017/yago"
++# Or for MongoDB Atlas:
++# MONGODB_URI="mongodb+srv://username:password@cluster.mongodb.net/yago"
++```
++
++### Step 3: Create Database Connection
++
++Create `lib/mongodb.ts`:
++
++```typescript
++import mongoose from 'mongoose';
++
++const MONGODB_URI = process.env.MONGODB_URI!;
++
++if (!MONGODB_URI) {
++  throw new Error('Please define MONGODB_URI in .env');
++}
++
++let cached = global.mongoose;
++
++if (!cached) {
++  cached = global.mongoose = { conn: null, promise: null };
++}
++
++async function connectDB() {
++  if (cached.conn) {
++    return cached.conn;
++  }
++
++  if (!cached.promise) {
++    const opts = {
++      bufferCommands: false,
++    };
++
++    cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
++      return mongoose;
++    });
++  }
++
++  try {
++    cached.conn = await cached.promise;
++  } catch (e) {
++    cached.promise = null;
++    throw e;
++  }
++
++  return cached.conn;
++}
++
++export default connectDB;
++```
++
++### Step 4: Create Model
++
++Create `models/Subscriber.ts`:
++
++```typescript
++import mongoose from 'mongoose';
++
++const SubscriberSchema = new mongoose.Schema({
++  email: {
++    type: String,
++    required: true,
++    unique: true,
++    lowercase: true,
++    trim: true,
++  },
++  subscribedAt: {
++    type: Date,
++    default: Date.now,
++  },
++  firstName: String,
++  lastName: String,
++  source: {
++    type: String,
++    default: 'website',
++  },
++  emailSent: {
++    type: Boolean,
++    default: false,
++  },
++});
++
++SubscriberSchema.index({ email: 1 });
++SubscriberSchema.index({ subscribedAt: -1 });
++
++export default mongoose.models.Subscriber ||
++  mongoose.model('Subscriber', SubscriberSchema);
++```
++
++### Step 5: Update API Route
++
++Update `app/api/subscribe/route.ts`:
++
++```typescript
++import connectDB from '@/lib/mongodb';
++import Subscriber from '@/models/Subscriber';
++import { sendWelcomeEmail } from '@/lib/mailgun';
++
++export async function POST(request: NextRequest) {
++  try {
++    await connectDB();
++
++    const { email } = await request.json();
++    const trimmedEmail = email.trim().toLowerCase();
++
++    // Check if email already exists
++    const existingSubscriber = await Subscriber.findOne({
++      email: trimmedEmail,
++    });
++
++    if (existingSubscriber) {
++      return NextResponse.json(
++        { message: 'You are already subscribed!', alreadySubscribed: true },
++        { status: 200 }
++      );
++    }
++
++    // Create new subscriber
++    const subscriber = await Subscriber.create({
++      email: trimmedEmail,
++    });
++
++    // Send welcome email
++    sendWelcomeEmail({ email: trimmedEmail }).catch((error) => {
++      console.error('Failed to send welcome email:', error);
++    });
++
++    return NextResponse.json(
++      { message: 'Successfully subscribed!', success: true },
++      { status: 201 }
++    );
++  } catch (error) {
++    console.error('Error in subscribe API:', error);
++    return NextResponse.json(
++      { error: 'Internal server error' },
++      { status: 500 }
++    );
++  }
++}
++
++export async function GET() {
++  try {
++    await connectDB();
++
++    const subscribers = await Subscriber.find()
++      .sort({ subscribedAt: -1 })
++      .lean();
++
++    return NextResponse.json(
++      { count: subscribers.length, subscribers },
++      { status: 200 }
++    );
++  } catch (error) {
++    console.error('Error fetching subscribers:', error);
++    return NextResponse.json(
++      { error: 'Internal server error' },
++      { status: 500 }
++    );
++  }
++}
++```
++
++### Step 6: Migrate Existing Data
++
++Create a migration script `scripts/migrate-to-mongodb.ts`:
++
++```typescript
++import mongoose from 'mongoose';
++import { promises as fs } from 'fs';
++import path from 'path';
++import Subscriber from '../models/Subscriber';
++
++async function migrate() {
++  await mongoose.connect(process.env.MONGODB_URI!);
++
++  const dataFile = path.join(process.cwd(), 'data', 'subscribers.json');
++  const data = await fs.readFile(dataFile, 'utf-8');
++  const subscribers = JSON.parse(data);
++
++  console.log(`Migrating ${subscribers.length} subscribers...`);
++
++  for (const sub of subscribers) {
++    await Subscriber.findOneAndUpdate(
++      { email: sub.email },
++      {
++        email: sub.email,
++        subscribedAt: new Date(sub.subscribedAt),
++      },
++      { upsert: true }
++    );
++  }
++
++  console.log('Migration complete!');
++  await mongoose.disconnect();
++}
++
++migrate().catch(console.error);
++```
++
++---
++
++## Deployment Options
++
++### Vercel (Recommended)
++
++1. **With Vercel Postgres**
++   - Go to Vercel Dashboard → Storage → Create Database
++   - Select Postgres
++   - Copy connection string to `.env`
++
++2. **With Vercel KV** (Alternative for simple key-value storage)
++   - Create KV database in Vercel
++   - Use `@vercel/kv` package
++
++### Other Options
++
++- **Supabase** (Free PostgreSQL with great features)
++- **MongoDB Atlas** (Free tier available)
++- **PlanetScale** (MySQL-compatible serverless)
++- **Railway** (Easy deployment with databases)
++
++---
++
++## Backup Strategy
++
++Once you migrate to a database, implement regular backups:
++
++### PostgreSQL Backups
++```bash
++pg_dump -U username -d yago > backup.sql
++```
++
++### MongoDB Backups
++```bash
++mongodump --uri="mongodb://..." --out=./backup
++```
++
++### Automated Backups
++- Use your hosting provider's backup features
++- Set up daily backups via cron jobs
++- Store backups in S3 or similar
++
++---
++
++## Next Steps After Migration
++
++1. **Add more subscriber fields**:
++   - Name, phone, preferences
++   - Tags or categories
++   - Custom fields
++
++2. **Implement advanced features**:
++   - Email unsubscribe
++   - Email preferences
++   - Segmentation
++   - Analytics
++
++3. **Set up monitoring**:
++   - Database performance
++   - Error tracking (Sentry)
++   - Uptime monitoring
++
++4. **Implement rate limiting**:
++   - Prevent spam signups
++   - API rate limits
++
++---
++
++## Need Help?
++
++If you need assistance with the migration, consider:
++- Hiring a database administrator
++- Using a database migration service
++- Consulting with a DevOps engineer
++
++The current JSON-based solution will work fine for now, but plan your migration based on your growth projections.
+diff --git a/MAILGUN_SETUP.md b/MAILGUN_SETUP.md
+new file mode 100644
+index 0000000..d8d08e9
+--- /dev/null
++++ b/MAILGUN_SETUP.md
+@@ -0,0 +1,289 @@
++# Mailgun Setup Guide for Yago
++
++## Quick Setup (5 minutes)
++
++### Step 1: Get Mailgun Credentials
++
++1. **Login to Mailgun**: https://app.mailgun.com
++2. **Get your API Key**:
++   - Go to Settings → API Keys
++   - Copy your "Private API key" (starts with `key-...`)
++3. **Get your Domain**:
++   - Go to Sending → Domains
++   - Copy your domain name (e.g., `sandbox123.mailgun.org` or `mg.yourdomain.com`)
++
++### Step 2: Configure Environment Variables
++
++1. **Create `.env.local` file** in the project root (if it doesn't exist):
++
++```bash
++# Create the file (if needed)
++echo. > .env.local
++```
++
++2. **Add your Mailgun credentials** to `.env.local`:
++
++```env
++# Mailgun Configuration
++MAILGUN_API_KEY=key-your_actual_api_key_here
++MAILGUN_DOMAIN=your_domain_here.mailgun.org
++```
++
++**Example**:
++```env
++MAILGUN_API_KEY=key-1234567890abcdef1234567890abcdef
++MAILGUN_DOMAIN=sandbox1a2b3c4d5e6f7g8h9i0j.mailgun.org
++```
++
++### Step 3: Restart Development Server
++
++```bash
++# Stop the current server (Ctrl+C in the terminal)
++# Then restart:
++npm run dev -- -p 3004
++```
++
++### Step 4: Test Email Sending
++
++1. **Go to your site**: http://localhost:3004
++2. **Enter your real email address**
++3. **Click "Notify Me"**
++4. **Check your inbox** for the welcome email
++
++---
++
++## Using Sandbox Domain (Free Testing)
++
++Mailgun provides a **sandbox domain** for free testing.
++
++### Limitations:
++- Can only send to **authorized recipients** (emails you pre-approve)
++- Limited to **300 emails/day**
++- Perfect for testing!
++
++### How to Add Authorized Recipients:
++
++1. Go to **Sending → Domains** in Mailgun
++2. Click on your **sandbox domain**
++3. Scroll down to **Authorized Recipients**
++4. Click **Add Recipient**
++5. Enter your email address
++6. **Check your email** and click the confirmation link
++7. Now you can receive test emails!
++
++---
++
++## Using Your Own Domain (Production)
++
++For production, you should use your own domain (e.g., `mg.yago.co.uz`).
++
++### Step 1: Add Your Domain to Mailgun
++
++1. Go to **Sending → Domains** in Mailgun
++2. Click **Add New Domain**
++3. Enter your subdomain: `mg.yago.co.uz` (or `mail.yago.co.uz`)
++4. Click **Add Domain**
++
++### Step 2: Verify Domain with DNS Records
++
++Mailgun will provide DNS records to add to your domain:
++
++**You'll need to add these DNS records** (example):
++
++| Type | Host | Value | Priority |
++|------|------|-------|----------|
++| TXT | @ | v=spf1 include:mailgun.org ~all | - |
++| TXT | _dmarc | v=DMARC1; p=none | - |
++| TXT | k1._domainkey | (long key provided by Mailgun) | - |
++| CNAME | email | mailgun.org | - |
++| MX | @ | mxa.mailgun.org | 10 |
++| MX | @ | mxb.mailgun.org | 10 |
++
++### Step 3: Add DNS Records to Your Domain Provider
++
++**Where to add these records depends on your domain provider:**
++
++#### If using **Cloudflare**:
++1. Go to Cloudflare dashboard
++2. Select your domain
++3. Go to **DNS** → **Records**
++4. Click **Add record**
++5. Add each record from Mailgun
++
++#### If using **GoDaddy**:
++1. Go to GoDaddy DNS Management
++2. Add each record under DNS settings
++
++#### If using **Namecheap**:
++1. Go to Domain List → Manage
++2. Advanced DNS
++3. Add each record
++
++### Step 4: Verify Domain in Mailgun
++
++1. After adding DNS records, **wait 10-15 minutes** for propagation
++2. Go back to Mailgun → Domains
++3. Click **Verify DNS Settings**
++4. If verified, you'll see green checkmarks ✅
++
++### Step 5: Update Environment Variable
++
++```env
++MAILGUN_DOMAIN=mg.yago.co.uz
++```
++
++---
++
++## Troubleshooting
++
++### Email Not Sending?
++
++**Check 1: Are environment variables set?**
++```bash
++# In your terminal, check if variables are loaded
++echo $MAILGUN_API_KEY
++# Should show your key
++```
++
++**Check 2: Server logs**
++Look at your terminal where the dev server is running. You should see:
++- `Welcome email sent successfully:` (if working)
++- `Mailgun not configured` (if env vars not loaded)
++- Error messages (if something is wrong)
++
++**Check 3: Restart server after adding .env.local**
++```bash
++# Stop server (Ctrl+C)
++npm run dev -- -p 3004
++```
++
++### Using Sandbox Domain?
++
++**Add authorized recipient:**
++1. Mailgun → Domains → Your Sandbox Domain
++2. Authorized Recipients → Add Recipient
++3. Enter your email and verify it
++
++### Email Goes to Spam?
++
++For production with your own domain:
++1. ✅ Verify all DNS records (SPF, DKIM, DMARC)
++2. ✅ Use a dedicated subdomain (mg.yago.co.uz)
++3. ✅ Warm up your domain (start with small volumes)
++4. ✅ Monitor your sender reputation
++
++---
++
++## Email Limits
++
++### Free Plan (Sandbox):
++- 300 emails/day for 3 months
++- Only to authorized recipients
++- Good for testing
++
++### Paid Plans:
++- **Flex**: Pay as you go ($0.80 per 1,000 emails)
++- **Grow**: $35/month (50,000 emails)
++- **Scale**: Custom pricing
++
++---
++
++## Security Best Practices
++
++### 1. Never Commit .env.local
++Already in `.gitignore` ✅
++
++### 2. Rotate API Keys Regularly
++Every 3-6 months, generate new keys
++
++### 3. Use Different Keys for Environments
++- Development: Sandbox domain
++- Production: Your domain
++
++### 4. Monitor Email Activity
++Check Mailgun logs regularly for suspicious activity
++
++---
++
++## Testing Checklist
++
++- [ ] API key copied from Mailgun
++- [ ] Domain name copied from Mailgun
++- [ ] .env.local file created
++- [ ] Environment variables added
++- [ ] Dev server restarted
++- [ ] Authorized recipient added (if using sandbox)
++- [ ] Test email submitted
++- [ ] Email received in inbox
++- [ ] Email looks good (check template)
++- [ ] Links work in email
++
++---
++
++## Quick Commands Reference
++
++```bash
++# Create .env.local file
++echo. > .env.local
++
++# Edit .env.local (use your preferred editor)
++notepad .env.local
++# OR
++code .env.local
++
++# Restart dev server
++npm run dev -- -p 3004
++
++# Check if email was sent (look for this in terminal logs)
++"Welcome email sent successfully"
++```
++
++---
++
++## Example .env.local File
++
++```env
++# Mailgun Configuration
++MAILGUN_API_KEY=key-1234567890abcdef1234567890abcdef
++MAILGUN_DOMAIN=sandbox1a2b3c4d5e6f7g8h9i0j.mailgun.org
++
++# Optional: Other environment variables
++# NEXT_PUBLIC_SITE_URL=http://localhost:3004
++```
++
++---
++
++## Need Help?
++
++### Check Mailgun Logs:
++1. Go to Mailgun dashboard
++2. Click **Sending** → **Logs**
++3. See all email attempts, deliveries, and failures
++
++### Common Issues:
++
++**"Mailgun not configured"**
++→ Environment variables not loaded. Restart server.
++
++**"401 Unauthorized"**
++→ Wrong API key. Check and update.
++
++**"Domain not found"**
++→ Wrong domain name. Check spelling.
++
++**"Recipient not authorized"**
++→ Add recipient to sandbox domain.
++
++---
++
++## What's Next?
++
++After Mailgun is configured, we can:
++1. ✅ Test the current email template
++2. 🎨 Design a custom email template
++3. 📊 Add email tracking
++4. 📧 Create additional email types (launch announcement, updates, etc.)
++
++---
++
++Ready to configure? Let's do it! 🚀
+diff --git a/SETUP.md b/SETUP.md
+new file mode 100644
+index 0000000..8cd6408
+--- /dev/null
++++ b/SETUP.md
+@@ -0,0 +1,441 @@
++# Yago Email Subscription Setup Guide
++
++## Overview
++
++Your Yago coming soon page now includes a fully functional email subscription system with:
++- ✅ Email collection and storage
++- ✅ Mailgun integration for automated welcome emails
++- ✅ Admin dashboard to view and export subscribers
++- ✅ Beautiful success modal with early bird messaging
++- ✅ Database migration guides (PostgreSQL/MongoDB)
++
++---
++
++## Quick Start
++
++### 1. Development Setup
++
++The app is currently running on **http://localhost:3004**
++
++To restart the dev server:
++```bash
++npm run dev -- -p 3004
++```
++
++### 2. Configure Mailgun (Optional but Recommended)
++
++To enable automated welcome emails:
++
++1. **Get Your Mailgun Credentials**:
++   - Go to https://app.mailgun.com/settings/api_security
++   - Copy your API key
++   - Note your domain (e.g., `mg.yourdomain.com` or sandbox domain)
++
++2. **Create `.env.local` file**:
++```env
++MAILGUN_API_KEY=your_mailgun_api_key_here
++MAILGUN_DOMAIN=your_mailgun_domain_here
++```
++
++3. **Test the integration**:
++   - Submit a test email on your site
++   - Check if you receive the welcome email
++   - Check server logs for any errors
++
++**Note**: If Mailgun is not configured, emails won't be sent but subscriptions will still be saved.
++
++---
++
++## Features
++
++### 1. Email Subscription Form
++
++**Location**: Main page (`/`)
++
++**Features**:
++- Email validation (frontend & backend)
++- Duplicate detection
++- Loading states with spinner
++- Error handling
++- Success modal with congratulations message
++
++**User Flow**:
++1. Visitor enters email
++2. Clicks "Notify Me"
++3. Email is validated and saved
++4. Welcome email is sent (if Mailgun configured)
++5. Beautiful modal appears with early bird benefits
++6. Visitor can close modal and continue exploring
++
++### 2. Admin Dashboard
++
++**Location**: http://localhost:3004/admin/subscribers
++
++**Features**:
++- View all subscribers
++- Real-time subscriber count
++- Export to CSV
++- Refresh data
++- Responsive design
++- Formatted dates
++
++**Note**: Currently no authentication - add password protection before deploying!
++
++**To add basic authentication**, create `app/admin/subscribers/layout.tsx`:
++
++```typescript
++'use client';
++
++import { useState, useEffect } from 'react';
++
++export default function AdminLayout({
++  children,
++}: {
++  children: React.ReactNode;
++}) {
++  const [isAuthenticated, setIsAuthenticated] = useState(false);
++  const [password, setPassword] = useState('');
++
++  const handleSubmit = (e: React.FormEvent) => {
++    e.preventDefault();
++    // Change this password!
++    if (password === 'your-secure-password') {
++      setIsAuthenticated(true);
++      sessionStorage.setItem('admin-auth', 'true');
++    } else {
++      alert('Invalid password');
++    }
++  };
++
++  useEffect(() => {
++    if (sessionStorage.getItem('admin-auth') === 'true') {
++      setIsAuthenticated(true);
++    }
++  }, []);
++
++  if (!isAuthenticated) {
++    return (
++      <div className="min-h-screen bg-black flex items-center justify-center">
++        <form onSubmit={handleSubmit} className="max-w-md w-full p-8 border border-[#C59D5F]/30">
++          <h1 className="text-2xl text-[#D4AF37] mb-4">Admin Access</h1>
++          <input
++            type="password"
++            value={password}
++            onChange={(e) => setPassword(e.target.value)}
++            placeholder="Enter password"
++            className="w-full bg-black border border-[#C59D5F]/30 text-white px-4 py-2 mb-4"
++          />
++          <button
++            type="submit"
++            className="w-full bg-gradient-to-r from-[#D4AF37] to-[#C59D5F] text-black py-2 font-semibold"
++          >
++            Login
++          </button>
++        </form>
++      </div>
++    );
++  }
++
++  return <>{children}</>;
++}
++```
++
++### 3. Welcome Email
++
++**Triggered**: Automatically after successful subscription
++
++**Template Features**:
++- Luxury design matching your brand
++- Early bird benefits list
++- Call-to-action button
++- Responsive HTML email
++- Plain text fallback
++
++**To customize the email**:
++Edit `lib/mailgun.ts` and update the HTML/text content.
++
++### 4. Data Storage
++
++**Current**: JSON file at `data/subscribers.json`
++
++**Format**:
++```json
++[
++  {
++    "email": "user@example.com",
++    "subscribedAt": "2025-11-18T10:30:00.000Z"
++  }
++]
++```
++
++**Location**:
++- Development: `D:\Projects\jovoxYago\data\subscribers.json`
++- Protected by `.gitignore` (won't be committed to Git)
++
++**To view subscribers**:
++1. Check the file directly
++2. Use the admin dashboard
++3. Call the API: `GET /api/subscribe`
++
++---
++
++## API Endpoints
++
++### POST /api/subscribe
++
++Subscribe a new email address.
++
++**Request**:
++```json
++{
++  "email": "user@example.com"
++}
++```
++
++**Success Response** (201):
++```json
++{
++  "message": "Successfully subscribed!",
++  "success": true
++}
++```
++
++**Duplicate Response** (200):
++```json
++{
++  "message": "You are already subscribed!",
++  "alreadySubscribed": true
++}
++```
++
++**Error Response** (400):
++```json
++{
++  "error": "Invalid email address"
++}
++```
++
++### GET /api/subscribe
++
++Get all subscribers (for admin use).
++
++**Response** (200):
++```json
++{
++  "count": 42,
++  "subscribers": [
++    {
++      "email": "user@example.com",
++      "subscribedAt": "2025-11-18T10:30:00.000Z"
++    }
++  ]
++}
++```
++
++---
++
++## Deployment
++
++### Before Deploying
++
++1. **Set up environment variables**:
++   - Add `MAILGUN_API_KEY` and `MAILGUN_DOMAIN` to your hosting provider
++
++2. **Add authentication to admin dashboard**:
++   - Implement the layout example above
++   - Or use a proper auth solution (NextAuth.js, Clerk, etc.)
++
++3. **Test thoroughly**:
++   - Test email submission
++   - Test duplicate prevention
++   - Test welcome email delivery
++   - Test admin dashboard
++   - Test CSV export
++
++### Deploy to Vercel
++
++1. **Push to GitHub**:
++```bash
++git add .
++git commit -m "Add email subscription system"
++git push
++```
++
++2. **Deploy to Vercel**:
++```bash
++npm install -g vercel
++vercel
++```
++
++3. **Add Environment Variables**:
++   - Go to Vercel Dashboard → Settings → Environment Variables
++   - Add `MAILGUN_API_KEY`
++   - Add `MAILGUN_DOMAIN`
++   - Redeploy
++
++4. **Verify DNS (for Mailgun)**:
++   - Add DNS records in your domain provider
++   - Verify domain in Mailgun dashboard
++
++### Data Persistence on Vercel
++
++⚠️ **Important**: Vercel's filesystem is ephemeral. The JSON file will be reset on each deployment.
++
++**Solutions**:
++1. **Migrate to a database** (Recommended)
++   - See `DATABASE_MIGRATION.md` for guides
++   - Use Vercel Postgres, MongoDB Atlas, or Supabase
++
++2. **Use Vercel KV** (Simple alternative)
++   ```bash
++   npm install @vercel/kv
++   ```
++
++3. **Use Vercel Blob** (File storage)
++   ```bash
++   npm install @vercel/blob
++   ```
++
++---
++
++## File Structure
++
++```
++jovoxYago/
++├── app/
++│   ├── api/
++│   │   └── subscribe/
++│   │       └── route.ts          # API endpoint
++│   ├── admin/
++│   │   └── subscribers/
++│   │       └── page.tsx          # Admin dashboard
++│   ├── coming-soon.tsx           # Main page
++│   └── ...
++├── components/
++│   └── SuccessModal.tsx          # Congratulations modal
++├── lib/
++│   └── mailgun.ts                # Email service
++├── data/
++│   └── subscribers.json          # Subscriber storage (gitignored)
++├── .env.example                  # Environment variables template
++├── .env.local                    # Your local environment (gitignored)
++├── DATABASE_MIGRATION.md         # Database migration guide
++└── SETUP.md                      # This file
++```
++
++---
++
++## Troubleshooting
++
++### Welcome emails not sending
++
++1. Check environment variables are set correctly
++2. Verify Mailgun API key is valid
++3. Check Mailgun domain is verified
++4. Check server logs for errors
++5. Test with Mailgun sandbox domain first
++
++### Subscribers not saving
++
++1. Check `data` directory exists and is writable
++2. Check server logs for errors
++3. Verify API endpoint is being called
++4. Check browser console for errors
++
++### Admin dashboard showing empty
++
++1. Check if `data/subscribers.json` exists
++2. Verify the file contains valid JSON
++3. Check API endpoint is working: `GET /api/subscribe`
++4. Check browser console for errors
++
++### Port already in use
++
++```bash
++# Find process using port
++netstat -ano | findstr :3004
++
++# Kill the process (replace PID)
++taskkill /F /PID <PID>
++
++# Or use a different port
++npm run dev -- -p 3005
++```
++
++---
++
++## Next Steps
++
++### Immediate
++- [ ] Configure Mailgun credentials
++- [ ] Test email subscription flow
++- [ ] Add admin dashboard authentication
++- [ ] Customize welcome email template
++
++### Before Launch
++- [ ] Test on mobile devices
++- [ ] Set up proper database (see DATABASE_MIGRATION.md)
++- [ ] Add analytics tracking
++- [ ] Set up error monitoring (Sentry)
++- [ ] Add rate limiting to prevent spam
++- [ ] Test email deliverability
++
++### Post-Launch
++- [ ] Monitor subscriber growth
++- [ ] A/B test messaging
++- [ ] Set up email sequences
++- [ ] Add unsubscribe functionality
++- [ ] Create segmentation
++- [ ] Integrate with CRM
++
++---
++
++## Support
++
++If you need help:
++1. Check the troubleshooting section
++2. Review the documentation files
++3. Check server logs for errors
++4. Test each component individually
++
++---
++
++## Security Considerations
++
++1. **Admin Dashboard**: Add authentication before deploying
++2. **Rate Limiting**: Add to prevent spam (use Vercel's rate limiting or upstash)
++3. **Email Validation**: Already implemented
++4. **Environment Variables**: Never commit `.env.local` to Git
++5. **API Keys**: Rotate regularly
++6. **CORS**: Configure if needed for API access
++
++---
++
++## Maintenance
++
++### Regular Tasks
++- Monitor subscriber growth
++- Check email delivery rates
++- Review error logs
++- Update dependencies
++- Backup subscriber data
++
++### Monthly
++- Review and clean invalid emails
++- Check Mailgun usage/costs
++- Update welcome email content
++- Analyze subscriber patterns
++
++---
++
++## License & Credits
++
++Built for Yago Concierge with:
++- Next.js 14
++- Framer Motion
++- Mailgun.js
++- Lucide Icons
++
++---
++
++**Questions?** Review the code comments or create an issue in your repository.
+diff --git a/app/admin/page.tsx b/app/admin/page.tsx
+new file mode 100644
+index 0000000..2622ac7
+--- /dev/null
++++ b/app/admin/page.tsx
+@@ -0,0 +1,253 @@
++'use client';
++
++import { useState, useEffect } from 'react';
++import { motion } from 'framer-motion';
++import { Lock, User, Eye, EyeOff, ChevronRight } from 'lucide-react';
++import { useRouter } from 'next/navigation';
++
++const ADMIN_CREDENTIALS = {
++  username: 'yagoadminj',
++  password: 'password123',
++};
++
++export default function AdminLogin() {
++  const router = useRouter();
++  const [username, setUsername] = useState('');
++  const [password, setPassword] = useState('');
++  const [showPassword, setShowPassword] = useState(false);
++  const [error, setError] = useState('');
++  const [isLoading, setIsLoading] = useState(false);
++
++  useEffect(() => {
++    // Check if already authenticated
++    const isAuth = sessionStorage.getItem('admin-auth');
++    if (isAuth === 'true') {
++      router.push('/admin/subscribers');
++    }
++  }, [router]);
++
++  const handleSubmit = async (e: React.FormEvent) => {
++    e.preventDefault();
++    setError('');
++    setIsLoading(true);
++
++    // Simulate a brief loading for security
++    await new Promise((resolve) => setTimeout(resolve, 500));
++
++    if (
++      username === ADMIN_CREDENTIALS.username &&
++      password === ADMIN_CREDENTIALS.password
++    ) {
++      sessionStorage.setItem('admin-auth', 'true');
++      router.push('/admin/subscribers');
++    } else {
++      setError('Invalid username or password');
++      setPassword('');
++    }
++
++    setIsLoading(false);
++  };
++
++  return (
++    <div className="min-h-screen bg-black relative overflow-hidden">
++      {/* Animated background pattern */}
++      <div className="absolute inset-0 opacity-5">
++        <div
++          className="absolute inset-0"
++          style={{
++            backgroundImage: `repeating-linear-gradient(
++              45deg,
++              transparent,
++              transparent 60px,
++              rgba(197, 157, 95, 0.1) 60px,
++              rgba(197, 157, 95, 0.1) 120px
++            )`,
++          }}
++        />
++      </div>
++
++      {/* Golden glow effects */}
++      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#C59D5F] rounded-full filter blur-[120px] opacity-10 animate-pulse" />
++      <div
++        className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[#D4AF37] rounded-full filter blur-[120px] opacity-10 animate-pulse"
++        style={{ animationDelay: '1s' }}
++      />
++
++      {/* Main content */}
++      <div className="relative z-10 flex items-center justify-center min-h-screen px-4">
++        <motion.div
++          initial={{ opacity: 0, y: 20 }}
++          animate={{ opacity: 1, y: 0 }}
++          transition={{ duration: 0.6 }}
++          className="w-full max-w-md"
++        >
++          {/* Logo */}
++          <div className="text-center mb-8">
++            <motion.h1
++              initial={{ opacity: 0, scale: 0.9 }}
++              animate={{ opacity: 1, scale: 1 }}
++              transition={{ duration: 0.6, delay: 0.1 }}
++              className="font-playfair text-5xl font-bold tracking-wider text-transparent bg-clip-text bg-gradient-to-br from-[#D4AF37] via-[#F4E5C3] to-[#C59D5F] mb-2"
++            >
++              YAGO
++            </motion.h1>
++            <div className="h-[2px] bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent mx-auto w-32" />
++          </div>
++
++          {/* Login Card */}
++          <div className="relative">
++            {/* Golden glow */}
++            <div className="absolute -inset-1 bg-gradient-to-r from-[#D4AF37] to-[#C59D5F] opacity-20 blur-xl" />
++
++            {/* Card */}
++            <div className="relative bg-black border-2 border-[#C59D5F]/30 p-8">
++              {/* Header */}
++              <div className="flex items-center justify-center gap-3 mb-6">
++                <div className="bg-gradient-to-br from-[#D4AF37] to-[#C59D5F] p-2 rounded">
++                  <Lock className="w-5 h-5 text-black" />
++                </div>
++                <h2 className="text-2xl font-playfair text-[#D4AF37]">
++                  Admin Access
++                </h2>
++              </div>
++
++              <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-[#C59D5F] to-transparent mb-6" />
++
++              {/* Form */}
++              <form onSubmit={handleSubmit} className="space-y-6">
++                {/* Username */}
++                <div>
++                  <label
++                    htmlFor="username"
++                    className="block text-sm text-gray-400 mb-2 tracking-wide"
++                  >
++                    Username
++                  </label>
++                  <div className="relative group">
++                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
++                      <User className="w-5 h-5 text-gray-600" />
++                    </div>
++                    <input
++                      type="text"
++                      id="username"
++                      value={username}
++                      onChange={(e) => {
++                        setUsername(e.target.value);
++                        setError('');
++                      }}
++                      placeholder="Enter username"
++                      required
++                      disabled={isLoading}
++                      className="w-full bg-black/80 backdrop-blur-sm text-white pl-10 pr-4 py-3
++                               border border-[#C59D5F]/30 focus:border-[#D4AF37] outline-none
++                               placeholder-gray-600 text-sm tracking-wider
++                               transition-all duration-300 disabled:opacity-50"
++                      autoComplete="username"
++                    />
++                  </div>
++                </div>
++
++                {/* Password */}
++                <div>
++                  <label
++                    htmlFor="password"
++                    className="block text-sm text-gray-400 mb-2 tracking-wide"
++                  >
++                    Password
++                  </label>
++                  <div className="relative group">
++                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
++                      <Lock className="w-5 h-5 text-gray-600" />
++                    </div>
++                    <input
++                      type={showPassword ? 'text' : 'password'}
++                      id="password"
++                      value={password}
++                      onChange={(e) => {
++                        setPassword(e.target.value);
++                        setError('');
++                      }}
++                      placeholder="Enter password"
++                      required
++                      disabled={isLoading}
++                      className="w-full bg-black/80 backdrop-blur-sm text-white pl-10 pr-12 py-3
++                               border border-[#C59D5F]/30 focus:border-[#D4AF37] outline-none
++                               placeholder-gray-600 text-sm tracking-wider
++                               transition-all duration-300 disabled:opacity-50"
++                      autoComplete="current-password"
++                    />
++                    <button
++                      type="button"
++                      onClick={() => setShowPassword(!showPassword)}
++                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-600 hover:text-[#D4AF37] transition-colors"
++                      tabIndex={-1}
++                    >
++                      {showPassword ? (
++                        <EyeOff className="w-5 h-5" />
++                      ) : (
++                        <Eye className="w-5 h-5" />
++                      )}
++                    </button>
++                  </div>
++                </div>
++
++                {/* Error Message */}
++                {error && (
++                  <motion.div
++                    initial={{ opacity: 0, y: -10 }}
++                    animate={{ opacity: 1, y: 0 }}
++                    className="bg-red-900/20 border border-red-500/50 p-3 text-red-200 text-sm text-center"
++                  >
++                    {error}
++                  </motion.div>
++                )}
++
++                {/* Submit Button */}
++                <button
++                  type="submit"
++                  disabled={isLoading}
++                  className="w-full bg-gradient-to-r from-[#D4AF37] to-[#C59D5F] text-black py-3
++                           font-semibold tracking-widest text-sm uppercase
++                           hover:shadow-[0_0_30px_rgba(212,175,55,0.4)]
++                           transition-all duration-300
++                           disabled:opacity-50 disabled:cursor-not-allowed
++                           flex items-center justify-center gap-2 group"
++                >
++                  {isLoading ? (
++                    <span>Authenticating...</span>
++                  ) : (
++                    <>
++                      <span>Access Dashboard</span>
++                      <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
++                    </>
++                  )}
++                </button>
++              </form>
++
++              {/* Footer */}
++              <div className="mt-6 text-center text-gray-600 text-xs">
++                <p>Authorized personnel only</p>
++              </div>
++
++              {/* Decorative corner elements */}
++              <div className="absolute top-0 left-0 w-12 h-12 border-t border-l border-[#C59D5F]/30" />
++              <div className="absolute top-0 right-0 w-12 h-12 border-t border-r border-[#C59D5F]/30" />
++              <div className="absolute bottom-0 left-0 w-12 h-12 border-b border-l border-[#C59D5F]/30" />
++              <div className="absolute bottom-0 right-0 w-12 h-12 border-b border-r border-[#C59D5F]/30" />
++            </div>
++          </div>
++
++          {/* Back to home */}
++          <div className="mt-6 text-center">
++            <a
++              href="/"
++              className="text-gray-600 hover:text-[#D4AF37] text-sm transition-colors tracking-wide"
++            >
++              ← Back to Home
++            </a>
++          </div>
++        </motion.div>
++      </div>
++    </div>
++  );
++}
+diff --git a/app/admin/subscribers/layout.tsx b/app/admin/subscribers/layout.tsx
+new file mode 100644
+index 0000000..a74a405
+--- /dev/null
++++ b/app/admin/subscribers/layout.tsx
+@@ -0,0 +1,51 @@
++'use client';
++
++import { useEffect, useState } from 'react';
++import { useRouter } from 'next/navigation';
++import { motion } from 'framer-motion';
++import { Shield } from 'lucide-react';
++
++export default function SubscribersLayout({
++  children,
++}: {
++  children: React.ReactNode;
++}) {
++  const router = useRouter();
++  const [isAuthenticated, setIsAuthenticated] = useState(false);
++  const [isChecking, setIsChecking] = useState(true);
++
++  useEffect(() => {
++    const checkAuth = () => {
++      const isAuth = sessionStorage.getItem('admin-auth');
++      if (isAuth === 'true') {
++        setIsAuthenticated(true);
++      } else {
++        router.push('/admin');
++      }
++      setIsChecking(false);
++    };
++
++    checkAuth();
++  }, [router]);
++
++  if (isChecking) {
++    return (
++      <div className="min-h-screen bg-black flex items-center justify-center">
++        <motion.div
++          initial={{ opacity: 0 }}
++          animate={{ opacity: 1 }}
++          className="flex flex-col items-center gap-4"
++        >
++          <Shield className="w-12 h-12 text-[#D4AF37] animate-pulse" />
++          <p className="text-gray-400 tracking-wide">Verifying access...</p>
++        </motion.div>
++      </div>
++    );
++  }
++
++  if (!isAuthenticated) {
++    return null;
++  }
++
++  return <>{children}</>;
++}
+diff --git a/app/admin/subscribers/page.tsx b/app/admin/subscribers/page.tsx
+new file mode 100644
+index 0000000..d9b703b
+--- /dev/null
++++ b/app/admin/subscribers/page.tsx
+@@ -0,0 +1,276 @@
++'use client';
++
++import { useState, useEffect } from 'react';
++import { motion } from 'framer-motion';
++import { Download, Mail, Calendar, RefreshCw, Users, ArrowLeft, LogOut } from 'lucide-react';
++import Link from 'next/link';
++import { useRouter } from 'next/navigation';
++
++interface Subscriber {
++  email: string;
++  subscribedAt: string;
++}
++
++export default function AdminSubscribers() {
++  const router = useRouter();
++  const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
++  const [loading, setLoading] = useState(true);
++  const [error, setError] = useState('');
++
++  const handleLogout = () => {
++    sessionStorage.removeItem('admin-auth');
++    router.push('/admin');
++  };
++
++  const fetchSubscribers = async () => {
++    setLoading(true);
++    setError('');
++    try {
++      const response = await fetch('/api/subscribe');
++      if (!response.ok) {
++        throw new Error('Failed to fetch subscribers');
++      }
++      const data = await response.json();
++      setSubscribers(data.subscribers || []);
++    } catch (err) {
++      setError('Failed to load subscribers. Please try again.');
++      console.error(err);
++    } finally {
++      setLoading(false);
++    }
++  };
++
++  useEffect(() => {
++    fetchSubscribers();
++  }, []);
++
++  const exportToCSV = () => {
++    if (subscribers.length === 0) return;
++
++    const headers = ['Email', 'Subscribed At'];
++    const rows = subscribers.map((sub) => [
++      sub.email,
++      new Date(sub.subscribedAt).toLocaleString(),
++    ]);
++
++    const csvContent = [
++      headers.join(','),
++      ...rows.map((row) => row.join(',')),
++    ].join('\n');
++
++    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
++    const link = document.createElement('a');
++    const url = URL.createObjectURL(blob);
++
++    link.setAttribute('href', url);
++    link.setAttribute('download', `yago-subscribers-${new Date().toISOString().split('T')[0]}.csv`);
++    link.style.visibility = 'hidden';
++    document.body.appendChild(link);
++    link.click();
++    document.body.removeChild(link);
++  };
++
++  const formatDate = (dateString: string) => {
++    return new Date(dateString).toLocaleString('en-US', {
++      year: 'numeric',
++      month: 'short',
++      day: 'numeric',
++      hour: '2-digit',
++      minute: '2-digit',
++    });
++  };
++
++  return (
++    <div className="min-h-screen bg-black text-white">
++      {/* Background effects */}
++      <div className="absolute inset-0 opacity-5">
++        <div
++          className="absolute inset-0"
++          style={{
++            backgroundImage: `repeating-linear-gradient(
++              45deg,
++              transparent,
++              transparent 60px,
++              rgba(197, 157, 95, 0.1) 60px,
++              rgba(197, 157, 95, 0.1) 120px
++            )`,
++          }}
++        />
++      </div>
++
++      <div className="relative z-10 container mx-auto px-4 py-8 max-w-6xl">
++        {/* Header */}
++        <div className="mb-8">
++          <div className="flex items-center justify-between mb-6">
++            <Link
++              href="/"
++              className="inline-flex items-center gap-2 text-gray-400 hover:text-[#D4AF37] transition-colors"
++            >
++              <ArrowLeft className="w-4 h-4" />
++              <span>Back to Home</span>
++            </Link>
++
++            <button
++              onClick={handleLogout}
++              className="inline-flex items-center gap-2 text-gray-400 hover:text-red-400 transition-colors
++                       px-4 py-2 border border-gray-700 hover:border-red-500/50"
++            >
++              <LogOut className="w-4 h-4" />
++              <span>Logout</span>
++            </button>
++          </div>
++
++          <motion.div
++            initial={{ opacity: 0, y: 20 }}
++            animate={{ opacity: 1, y: 0 }}
++            transition={{ duration: 0.6 }}
++          >
++            <h1 className="font-playfair text-4xl md:text-5xl text-transparent bg-clip-text bg-gradient-to-br from-[#D4AF37] via-[#F4E5C3] to-[#C59D5F] mb-4">
++              Subscriber Dashboard
++            </h1>
++            <div className="w-24 h-[2px] bg-gradient-to-r from-[#D4AF37] to-transparent mb-6" />
++            <p className="text-gray-400">Manage your exclusive waitlist members</p>
++          </motion.div>
++        </div>
++
++        {/* Stats Card */}
++        <motion.div
++          initial={{ opacity: 0, y: 20 }}
++          animate={{ opacity: 1, y: 0 }}
++          transition={{ duration: 0.6, delay: 0.1 }}
++          className="bg-gradient-to-br from-[#1a1a1a] to-[#0a0a0a] border border-[#C59D5F]/30 p-6 mb-8"
++        >
++          <div className="flex items-center justify-between flex-wrap gap-4">
++            <div className="flex items-center gap-3">
++              <div className="bg-gradient-to-br from-[#D4AF37] to-[#C59D5F] p-3 rounded-lg">
++                <Users className="w-6 h-6 text-black" />
++              </div>
++              <div>
++                <p className="text-gray-400 text-sm">Total Subscribers</p>
++                <p className="text-3xl font-bold text-[#D4AF37]">
++                  {subscribers.length}
++                </p>
++              </div>
++            </div>
++
++            <div className="flex gap-3">
++              <button
++                onClick={fetchSubscribers}
++                disabled={loading}
++                className="flex items-center gap-2 px-4 py-2 bg-[#1a1a1a] border border-[#C59D5F]/30
++                         hover:border-[#D4AF37] transition-all text-sm disabled:opacity-50"
++              >
++                <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
++                <span>Refresh</span>
++              </button>
++
++              <button
++                onClick={exportToCSV}
++                disabled={subscribers.length === 0}
++                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#D4AF37] to-[#C59D5F]
++                         text-black font-semibold hover:shadow-[0_0_20px_rgba(212,175,55,0.4)]
++                         transition-all text-sm disabled:opacity-50 disabled:cursor-not-allowed"
++              >
++                <Download className="w-4 h-4" />
++                <span>Export CSV</span>
++              </button>
++            </div>
++          </div>
++        </motion.div>
++
++        {/* Error Message */}
++        {error && (
++          <motion.div
++            initial={{ opacity: 0 }}
++            animate={{ opacity: 1 }}
++            className="bg-red-900/20 border border-red-500/50 p-4 mb-6 text-red-200"
++          >
++            {error}
++          </motion.div>
++        )}
++
++        {/* Subscribers Table */}
++        <motion.div
++          initial={{ opacity: 0, y: 20 }}
++          animate={{ opacity: 1, y: 0 }}
++          transition={{ duration: 0.6, delay: 0.2 }}
++          className="bg-gradient-to-br from-[#1a1a1a] to-[#0a0a0a] border border-[#C59D5F]/30 overflow-hidden"
++        >
++          {loading ? (
++            <div className="flex items-center justify-center py-20">
++              <RefreshCw className="w-8 h-8 text-[#D4AF37] animate-spin" />
++            </div>
++          ) : subscribers.length === 0 ? (
++            <div className="flex flex-col items-center justify-center py-20 px-4">
++              <Mail className="w-16 h-16 text-gray-600 mb-4" />
++              <p className="text-gray-400 text-lg">No subscribers yet</p>
++              <p className="text-gray-600 text-sm mt-2">
++                Subscribers will appear here when they sign up
++              </p>
++            </div>
++          ) : (
++            <div className="overflow-x-auto">
++              <table className="w-full">
++                <thead className="bg-black/50 border-b border-[#C59D5F]/30">
++                  <tr>
++                    <th className="text-left p-4 text-sm font-semibold text-[#D4AF37] uppercase tracking-wider">
++                      #
++                    </th>
++                    <th className="text-left p-4 text-sm font-semibold text-[#D4AF37] uppercase tracking-wider">
++                      <div className="flex items-center gap-2">
++                        <Mail className="w-4 h-4" />
++                        Email
++                      </div>
++                    </th>
++                    <th className="text-left p-4 text-sm font-semibold text-[#D4AF37] uppercase tracking-wider">
++                      <div className="flex items-center gap-2">
++                        <Calendar className="w-4 h-4" />
++                        Subscribed At
++                      </div>
++                    </th>
++                  </tr>
++                </thead>
++                <tbody>
++                  {subscribers.map((subscriber, index) => (
++                    <motion.tr
++                      key={subscriber.email}
++                      initial={{ opacity: 0, x: -20 }}
++                      animate={{ opacity: 1, x: 0 }}
++                      transition={{ duration: 0.3, delay: index * 0.05 }}
++                      className="border-b border-[#C59D5F]/10 hover:bg-[#D4AF37]/5 transition-colors"
++                    >
++                      <td className="p-4 text-gray-400 font-mono text-sm">
++                        {String(index + 1).padStart(3, '0')}
++                      </td>
++                      <td className="p-4 text-gray-200">
++                        {subscriber.email}
++                      </td>
++                      <td className="p-4 text-gray-400 text-sm">
++                        {formatDate(subscriber.subscribedAt)}
++                      </td>
++                    </motion.tr>
++                  ))}
++                </tbody>
++              </table>
++            </div>
++          )}
++        </motion.div>
++
++        {/* Footer Note */}
++        <motion.div
++          initial={{ opacity: 0 }}
++          animate={{ opacity: 1 }}
++          transition={{ duration: 0.6, delay: 0.3 }}
++          className="mt-8 text-center text-gray-600 text-sm"
++        >
++          <p>
++            Subscriber data is stored securely in{' '}
++            <code className="bg-[#1a1a1a] px-2 py-1 rounded text-[#C59D5F]">
++              data/subscribers.json
++            </code>
++          </p>
++        </motion.div>
++      </div>
++    </div>
++  );
++}
+diff --git a/app/api/subscribe/route.ts b/app/api/subscribe/route.ts
+new file mode 100644
+index 0000000..d4b18e3
+--- /dev/null
++++ b/app/api/subscribe/route.ts
+@@ -0,0 +1,139 @@
++import { NextRequest, NextResponse } from 'next/server';
++import { promises as fs } from 'fs';
++import path from 'path';
++import { sendWelcomeEmail } from '@/lib/mailgun';
++
++const DATA_FILE = path.join(process.cwd(), 'data', 'subscribers.json');
++
++interface Subscriber {
++  email: string;
++  subscribedAt: string;
++}
++
++// Ensure data directory and file exist
++async function ensureDataFile() {
++  try {
++    const dataDir = path.join(process.cwd(), 'data');
++    try {
++      await fs.access(dataDir);
++    } catch {
++      await fs.mkdir(dataDir, { recursive: true });
++    }
++
++    try {
++      await fs.access(DATA_FILE);
++    } catch {
++      await fs.writeFile(DATA_FILE, JSON.stringify([], null, 2));
++    }
++  } catch (error) {
++    console.error('Error ensuring data file:', error);
++  }
++}
++
++// Read subscribers from file
++async function readSubscribers(): Promise<Subscriber[]> {
++  try {
++    await ensureDataFile();
++    const data = await fs.readFile(DATA_FILE, 'utf-8');
++    return JSON.parse(data);
++  } catch (error) {
++    console.error('Error reading subscribers:', error);
++    return [];
++  }
++}
++
++// Write subscribers to file
++async function writeSubscribers(subscribers: Subscriber[]) {
++  try {
++    await ensureDataFile();
++    await fs.writeFile(DATA_FILE, JSON.stringify(subscribers, null, 2));
++  } catch (error) {
++    console.error('Error writing subscribers:', error);
++    throw error;
++  }
++}
++
++// Email validation regex
++const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
++
++export async function POST(request: NextRequest) {
++  try {
++    const body = await request.json();
++    const { email } = body;
++
++    // Validate email
++    if (!email || typeof email !== 'string') {
++      return NextResponse.json(
++        { error: 'Email is required' },
++        { status: 400 }
++      );
++    }
++
++    const trimmedEmail = email.trim().toLowerCase();
++
++    if (!EMAIL_REGEX.test(trimmedEmail)) {
++      return NextResponse.json(
++        { error: 'Invalid email address' },
++        { status: 400 }
++      );
++    }
++
++    // Read existing subscribers
++    const subscribers = await readSubscribers();
++
++    // Check if email already exists
++    const existingSubscriber = subscribers.find(
++      (sub) => sub.email === trimmedEmail
++    );
++
++    if (existingSubscriber) {
++      return NextResponse.json(
++        { message: 'You are already subscribed!', alreadySubscribed: true },
++        { status: 200 }
++      );
++    }
++
++    // Add new subscriber
++    const newSubscriber: Subscriber = {
++      email: trimmedEmail,
++      subscribedAt: new Date().toISOString(),
++    };
++
++    subscribers.push(newSubscriber);
++    await writeSubscribers(subscribers);
++
++    // Send welcome email (non-blocking)
++    sendWelcomeEmail({ email: trimmedEmail }).catch((error) => {
++      console.error('Failed to send welcome email:', error);
++      // Don't fail the subscription if email fails
++    });
++
++    return NextResponse.json(
++      { message: 'Successfully subscribed!', success: true },
++      { status: 201 }
++    );
++  } catch (error) {
++    console.error('Error in subscribe API:', error);
++    return NextResponse.json(
++      { error: 'Internal server error' },
++      { status: 500 }
++    );
++  }
++}
++
++// Optional: GET endpoint to retrieve subscribers (for admin use)
++export async function GET() {
++  try {
++    const subscribers = await readSubscribers();
++    return NextResponse.json(
++      { count: subscribers.length, subscribers },
++      { status: 200 }
++    );
++  } catch (error) {
++    console.error('Error fetching subscribers:', error);
++    return NextResponse.json(
++      { error: 'Internal server error' },
++      { status: 500 }
++    );
++  }
++}
+diff --git a/app/api/test-email/route.ts b/app/api/test-email/route.ts
+new file mode 100644
+index 0000000..26e67e3
+--- /dev/null
++++ b/app/api/test-email/route.ts
+@@ -0,0 +1,61 @@
++import { NextRequest, NextResponse } from 'next/server';
++import { sendWelcomeEmail } from '@/lib/mailgun';
++
++export async function POST(request: NextRequest) {
++  try {
++    const { email } = await request.json();
++
++    if (!email) {
++      return NextResponse.json(
++        { error: 'Email is required' },
++        { status: 400 }
++      );
++    }
++
++    console.log('=================================');
++    console.log('Testing Mailgun Configuration');
++    console.log('=================================');
++    console.log('To Email:', email);
++    console.log('API Key:', process.env.MAILGUN_API_KEY ? '✓ Set (length: ' + process.env.MAILGUN_API_KEY.length + ')' : '✗ Not set');
++    console.log('Domain:', process.env.MAILGUN_DOMAIN || '✗ Not set');
++    console.log('=================================');
++
++    const result = await sendWelcomeEmail({ email });
++
++    console.log('Email Send Result:', result);
++    console.log('=================================');
++
++    return NextResponse.json(result, { status: result.success ? 200 : 500 });
++  } catch (error: any) {
++    console.error('=================================');
++    console.error('Test Email Error:', error);
++    console.error('Error Details:', {
++      message: error.message,
++      status: error.status,
++      details: error.details,
++      type: error.type
++    });
++    console.error('=================================');
++
++    return NextResponse.json(
++      {
++        error: error.message || 'Failed to send test email',
++        details: error.details || '',
++        status: error.status || 500,
++        type: error.type || 'UnknownError'
++      },
++      { status: 500 }
++    );
++  }
++}
++
++export async function GET() {
++  return NextResponse.json({
++    message: 'Email Test Endpoint',
++    usage: 'POST to this endpoint with { "email": "test@example.com" }',
++    config: {
++      apiKeySet: !!process.env.MAILGUN_API_KEY,
++      domain: process.env.MAILGUN_DOMAIN || 'Not set',
++    }
++  });
++}
+diff --git a/app/coming-soon.tsx b/app/coming-soon.tsx
+index 4666ed2..36badae 100644
+--- a/app/coming-soon.tsx
++++ b/app/coming-soon.tsx
+@@ -2,27 +2,56 @@
+ 
+ import { useState, useEffect } from 'react';
+ import { motion } from 'framer-motion';
+-import { Instagram, Twitter, Mail, CheckCircle2, ChevronDown } from 'lucide-react';
++import { Linkedin, Twitter, Mail, CheckCircle2, ChevronDown, Loader2 } from 'lucide-react';
++import SuccessModal from '@/components/SuccessModal';
+ 
+ export default function ComingSoon() {
+   const [email, setEmail] = useState('');
+   const [isSubmitted, setIsSubmitted] = useState(false);
+   const [mounted, setMounted] = useState(false);
++  const [isLoading, setIsLoading] = useState(false);
++  const [showModal, setShowModal] = useState(false);
++  const [errorMessage, setErrorMessage] = useState('');
+ 
+   useEffect(() => {
+     setMounted(true);
+   }, []);
+ 
+-  const handleSubmit = (e: React.FormEvent) => {
++  const handleSubmit = async (e: React.FormEvent) => {
+     e.preventDefault();
+-    if (email) {
+-      // Here you would typically send to your email service
+-      console.log('Email submitted:', email);
+-      setIsSubmitted(true);
+-      setTimeout(() => {
++    if (!email) return;
++
++    setIsLoading(true);
++    setErrorMessage('');
++
++    try {
++      const response = await fetch('/api/subscribe', {
++        method: 'POST',
++        headers: {
++          'Content-Type': 'application/json',
++        },
++        body: JSON.stringify({ email }),
++      });
++
++      const data = await response.json();
++
++      if (response.ok) {
++        setIsSubmitted(true);
++        setShowModal(true);
+         setEmail('');
+-        setIsSubmitted(false);
+-      }, 3000);
++
++        // Reset submitted state after modal is closed
++        setTimeout(() => {
++          setIsSubmitted(false);
++        }, 5000);
++      } else {
++        setErrorMessage(data.error || 'Something went wrong. Please try again.');
++      }
++    } catch (error) {
++      console.error('Error submitting email:', error);
++      setErrorMessage('Network error. Please check your connection and try again.');
++    } finally {
++      setIsLoading(false);
+     }
+   };
+ 
+@@ -113,25 +142,48 @@ export default function ComingSoon() {
+                     <input
+                       type="email"
+                       value={email}
+-                      onChange={(e) => setEmail(e.target.value)}
++                      onChange={(e) => {
++                        setEmail(e.target.value);
++                        setErrorMessage('');
++                      }}
+                       placeholder="Enter your email"
+                       required
++                      disabled={isLoading}
+                       className="flex-1 bg-black/80 backdrop-blur-sm text-white px-6 py-4 sm:py-5
+                                border border-[#C59D5F]/30 focus:border-[#D4AF37] outline-none
+                                placeholder-gray-600 text-sm sm:text-base tracking-wider
+-                               transition-all duration-300"
++                               transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                     />
+                     <button
+                       type="submit"
++                      disabled={isLoading}
+                       className="bg-gradient-to-r from-[#D4AF37] to-[#C59D5F] text-black px-8 sm:px-12 py-4 sm:py-5
+                                font-semibold tracking-widest text-sm sm:text-base
+                                hover:shadow-[0_0_30px_rgba(212,175,55,0.3)]
+-                               transition-all duration-300 uppercase"
++                               transition-all duration-300 uppercase
++                               disabled:opacity-50 disabled:cursor-not-allowed
++                               flex items-center justify-center gap-2"
+                     >
+-                      Notify Me
++                      {isLoading ? (
++                        <>
++                          <Loader2 className="w-4 h-4 animate-spin" />
++                          <span className="hidden sm:inline">Processing</span>
++                        </>
++                      ) : (
++                        'Notify Me'
++                      )}
+                     </button>
+                   </div>
+                 </div>
++                {errorMessage && (
++                  <motion.p
++                    initial={{ opacity: 0, y: -10 }}
++                    animate={{ opacity: 1, y: 0 }}
++                    className="text-red-400 text-xs sm:text-sm mt-3 tracking-wide"
++                  >
++                    {errorMessage}
++                  </motion.p>
++                )}
+                 <p className="text-gray-600 text-xs sm:text-sm mt-4 tracking-wide">
+                   Be the first to experience luxury redefined
+                 </p>
+@@ -156,11 +208,13 @@ export default function ComingSoon() {
+             className="flex items-center justify-center gap-8 mb-8"
+           >
+             <a
+-              href="#"
++              href="https://www.linkedin.com/company/yagoconcierge"
++              target="_blank"
++              rel="noopener noreferrer"
+               className="text-gray-600 hover:text-[#D4AF37] transition-colors duration-300 transform hover:scale-110"
+-              aria-label="Instagram"
++              aria-label="LinkedIn"
+             >
+-              <Instagram className="w-6 h-6" />
++              <Linkedin className="w-6 h-6" />
+             </a>
+             <a
+               href="#"
+@@ -213,6 +267,9 @@ export default function ComingSoon() {
+       <div className="absolute top-0 right-0 w-32 h-32 border-t-2 border-r-2 border-[#C59D5F]/20" />
+       <div className="absolute bottom-0 left-0 w-32 h-32 border-b-2 border-l-2 border-[#C59D5F]/20" />
+       <div className="absolute bottom-0 right-0 w-32 h-32 border-b-2 border-r-2 border-[#C59D5F]/20" />
++
++      {/* Success Modal */}
++      <SuccessModal isOpen={showModal} onClose={() => setShowModal(false)} />
+     </div>
+   );
+ }
+diff --git a/components/SuccessModal.tsx b/components/SuccessModal.tsx
+new file mode 100644
+index 0000000..59c43b5
+--- /dev/null
++++ b/components/SuccessModal.tsx
+@@ -0,0 +1,151 @@
++'use client';
++
++import { motion, AnimatePresence } from 'framer-motion';
++import { CheckCircle2, X, Sparkles } from 'lucide-react';
++import { useEffect } from 'react';
++
++interface SuccessModalProps {
++  isOpen: boolean;
++  onClose: () => void;
++}
++
++export default function SuccessModal({ isOpen, onClose }: SuccessModalProps) {
++  // Close modal with Escape key
++  useEffect(() => {
++    const handleEscape = (e: KeyboardEvent) => {
++      if (e.key === 'Escape') onClose();
++    };
++
++    if (isOpen) {
++      document.addEventListener('keydown', handleEscape);
++      return () => document.removeEventListener('keydown', handleEscape);
++    }
++  }, [isOpen, onClose]);
++
++  return (
++    <AnimatePresence>
++      {isOpen && (
++        <>
++          {/* Backdrop */}
++          <motion.div
++            initial={{ opacity: 0 }}
++            animate={{ opacity: 1 }}
++            exit={{ opacity: 0 }}
++            onClick={onClose}
++            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
++          >
++            {/* Modal */}
++            <motion.div
++              initial={{ opacity: 0, scale: 0.9, y: 20 }}
++              animate={{ opacity: 1, scale: 1, y: 0 }}
++              exit={{ opacity: 0, scale: 0.9, y: 20 }}
++              transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
++              onClick={(e) => e.stopPropagation()}
++              className="relative bg-black border-2 border-[#C59D5F] max-w-md w-full p-8 sm:p-12"
++            >
++              {/* Close button */}
++              <button
++                onClick={onClose}
++                className="absolute top-4 right-4 text-gray-600 hover:text-[#D4AF37] transition-colors duration-300"
++                aria-label="Close"
++              >
++                <X className="w-5 h-5" />
++              </button>
++
++              {/* Golden glow effect */}
++              <div className="absolute -inset-0.5 bg-gradient-to-r from-[#D4AF37] to-[#C59D5F] opacity-20 blur-xl" />
++
++              {/* Content */}
++              <div className="relative text-center">
++                {/* Icon with animation */}
++                <motion.div
++                  initial={{ scale: 0 }}
++                  animate={{ scale: 1 }}
++                  transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
++                  className="mb-6 flex justify-center"
++                >
++                  <div className="relative">
++                    <CheckCircle2 className="w-20 h-20 text-[#D4AF37]" />
++                    <motion.div
++                      animate={{
++                        rotate: 360,
++                        scale: [1, 1.2, 1],
++                      }}
++                      transition={{
++                        duration: 3,
++                        repeat: Infinity,
++                        ease: 'linear',
++                      }}
++                      className="absolute -top-2 -right-2"
++                    >
++                      <Sparkles className="w-6 h-6 text-[#F4E5C3]" />
++                    </motion.div>
++                  </div>
++                </motion.div>
++
++                {/* Title */}
++                <motion.h2
++                  initial={{ opacity: 0, y: 10 }}
++                  animate={{ opacity: 1, y: 0 }}
++                  transition={{ delay: 0.3 }}
++                  className="font-playfair text-3xl sm:text-4xl text-transparent bg-clip-text bg-gradient-to-br from-[#D4AF37] via-[#F4E5C3] to-[#C59D5F] mb-4"
++                >
++                  Congratulations!
++                </motion.h2>
++
++                {/* Divider */}
++                <div className="w-24 h-[1px] bg-gradient-to-r from-transparent via-[#C59D5F] to-transparent mx-auto mb-6" />
++
++                {/* Message */}
++                <motion.div
++                  initial={{ opacity: 0 }}
++                  animate={{ opacity: 1 }}
++                  transition={{ delay: 0.4 }}
++                  className="space-y-4"
++                >
++                  <p className="text-gray-300 text-base sm:text-lg leading-relaxed">
++                    You&apos;ve successfully joined our exclusive waitlist!
++                  </p>
++                  <p className="text-gray-400 text-sm sm:text-base leading-relaxed">
++                    As an early bird, you&apos;ll receive{' '}
++                    <span className="text-[#D4AF37] font-semibold">
++                      first access
++                    </span>{' '}
++                    to Yago&apos;s premium concierge services and{' '}
++                    <span className="text-[#D4AF37] font-semibold">
++                      exclusive benefits
++                    </span>{' '}
++                    reserved for our founding members.
++                  </p>
++                  <p className="text-gray-500 text-sm">
++                    We&apos;ll notify you as soon as we launch.
++                  </p>
++                </motion.div>
++
++                {/* CTA Button */}
++                <motion.button
++                  initial={{ opacity: 0 }}
++                  animate={{ opacity: 1 }}
++                  transition={{ delay: 0.5 }}
++                  onClick={onClose}
++                  className="mt-8 bg-gradient-to-r from-[#D4AF37] to-[#C59D5F] text-black px-8 py-3
++                           font-semibold tracking-widest text-sm uppercase
++                           hover:shadow-[0_0_30px_rgba(212,175,55,0.4)]
++                           transition-all duration-300 w-full sm:w-auto"
++                >
++                  Continue Exploring
++                </motion.button>
++              </div>
++
++              {/* Decorative corner elements */}
++              <div className="absolute top-0 left-0 w-16 h-16 border-t border-l border-[#C59D5F]/30" />
++              <div className="absolute top-0 right-0 w-16 h-16 border-t border-r border-[#C59D5F]/30" />
++              <div className="absolute bottom-0 left-0 w-16 h-16 border-b border-l border-[#C59D5F]/30" />
++              <div className="absolute bottom-0 right-0 w-16 h-16 border-b border-r border-[#C59D5F]/30" />
++            </motion.div>
++          </motion.div>
++        </>
++      )}
++    </AnimatePresence>
++  );
++}
+diff --git a/lib/mailgun.ts b/lib/mailgun.ts
+new file mode 100644
+index 0000000..926cfad
+--- /dev/null
++++ b/lib/mailgun.ts
+@@ -0,0 +1,297 @@
++import formData from 'form-data';
++import Mailgun from 'mailgun.js';
++
++const mailgun = new Mailgun(formData);
++
++// Initialize Mailgun client
++const mg = process.env.MAILGUN_API_KEY
++  ? mailgun.client({
++      username: 'api',
++      key: process.env.MAILGUN_API_KEY,
++    })
++  : null;
++
++interface WelcomeEmailParams {
++  email: string;
++  firstName?: string;
++}
++
++export async function sendWelcomeEmail({ email, firstName }: WelcomeEmailParams) {
++  // If Mailgun is not configured, log and return
++  if (!mg || !process.env.MAILGUN_DOMAIN) {
++    console.log('Mailgun not configured. Email would be sent to:', email);
++    return { success: false, message: 'Email service not configured' };
++  }
++
++  try {
++    const recipientName = firstName || email.split('@')[0];
++
++    const emailData = {
++      from: `Yago Concierge <hello@${process.env.MAILGUN_DOMAIN}>`,
++      to: email,
++      'h:Reply-To': 'hello@yago.co.uz',
++      'h:List-Unsubscribe': '<mailto:unsubscribe@yago.co.uz>, <https://yago.co.uz/unsubscribe>',
++      'h:X-Mailer': 'Yago Concierge',
++      'h:Precedence': 'bulk',
++      subject: 'Welcome to Yago - Your Exclusive Journey Begins',
++      html: `
++        <!DOCTYPE html>
++        <html>
++        <head>
++          <meta charset="utf-8">
++          <meta name="viewport" content="width=device-width, initial-scale=1.0">
++          <title>Welcome to Yago</title>
++        </head>
++        <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif; background-color: #0A0A0A;">
++          <table width="100%" cellpadding="0" cellspacing="0" style="background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);">
++            <tr>
++              <td align="center" style="padding: 60px 20px;">
++                <table width="600" cellpadding="0" cellspacing="0" style="background-color: #000000; box-shadow: 0 20px 60px rgba(255, 107, 90, 0.15);">
++                  <!-- Premium Header -->
++                  <tr>
++                    <td align="center" style="padding: 60px 40px 40px 40px; background: linear-gradient(180deg, #0A0A0A 0%, #000000 100%);">
++                      <div style="margin-bottom: 30px;">
++                        <h1 style="margin: 0; font-size: 72px; font-weight: 900; color: #FF6B5A; letter-spacing: 12px; font-family: Arial Black, sans-serif; text-transform: uppercase;">
++                          YAGO
++                        </h1>
++                      </div>
++                      <div style="height: 3px; background: linear-gradient(to right, transparent, #FF6B5A, #D4AF37, #FF6B5A, transparent); margin: 0 auto; width: 80%; opacity: 0.6;"></div>
++                      <p style="margin: 25px 0 0 0; color: #D4AF37; font-size: 13px; letter-spacing: 4px; text-transform: uppercase; font-weight: 600;">
++                        Luxury Concierge Services
++                      </p>
++                    </td>
++                  </tr>
++
++                  <!-- Welcome Message -->
++                  <tr>
++                    <td style="padding: 50px 50px 30px 50px; text-align: center;">
++                      <h2 style="margin: 0 0 15px 0; color: #FFFFFF; font-size: 32px; font-weight: 300; letter-spacing: 1px;">
++                        Welcome, <span style="color: #FF6B5A; font-weight: 600;">${recipientName}</span>
++                      </h2>
++                      <p style="margin: 0; color: #999999; font-size: 15px; letter-spacing: 0.5px;">
++                        You've joined an exclusive circle
++                      </p>
++                    </td>
++                  </tr>
++
++                  <!-- Main Content -->
++                  <tr>
++                    <td style="padding: 0 50px 40px 50px;">
++                      <div style="height: 1px; background: linear-gradient(to right, transparent 0%, #FF6B5A 20%, #D4AF37 50%, #FF6B5A 80%, transparent 100%); margin-bottom: 40px; opacity: 0.3;"></div>
++
++                      <p style="color: #CCCCCC; font-size: 17px; line-height: 1.8; margin: 0 0 30px 0; text-align: center;">
++                        Thank you for expressing interest in <strong style="color: #FF6B5A;">Yago</strong>. You've taken the first step toward experiencing luxury concierge services redefined.
++                      </p>
++
++                      <!-- Benefits Card -->
++                      <div style="background: linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%); border: 1px solid #FF6B5A; border-radius: 8px; padding: 35px; margin: 40px 0;">
++                        <div style="text-align: center; margin-bottom: 25px;">
++                          <div style="display: inline-block; background: linear-gradient(90deg, #FF6B5A, #D4AF37); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
++                            <h3 style="margin: 0; font-size: 24px; font-weight: 700; letter-spacing: 2px;">
++                              EARLY BIRD BENEFITS
++                            </h3>
++                          </div>
++                          <div style="height: 2px; background: linear-gradient(to right, transparent, #FF6B5A, transparent); width: 60%; margin: 15px auto;"></div>
++                        </div>
++
++                        <table width="100%" cellpadding="0" cellspacing="0">
++                          <tr>
++                            <td style="padding: 12px 0;">
++                              <div style="display: flex; align-items: center;">
++                                <span style="color: #FF6B5A; font-size: 20px; margin-right: 15px;">✦</span>
++                                <p style="margin: 0; color: #E5E5E5; font-size: 15px; line-height: 1.6;">
++                                  <strong style="color: #D4AF37;">Priority Access</strong> to our premium concierge services
++                                </p>
++                              </div>
++                            </td>
++                          </tr>
++                          <tr>
++                            <td style="padding: 12px 0;">
++                              <div style="display: flex; align-items: center;">
++                                <span style="color: #FF6B5A; font-size: 20px; margin-right: 15px;">✦</span>
++                                <p style="margin: 0; color: #E5E5E5; font-size: 15px; line-height: 1.6;">
++                                  <strong style="color: #D4AF37;">Exclusive Discounts</strong> reserved for founding members
++                                </p>
++                              </div>
++                            </td>
++                          </tr>
++                          <tr>
++                            <td style="padding: 12px 0;">
++                              <div style="display: flex; align-items: center;">
++                                <span style="color: #FF6B5A; font-size: 20px; margin-right: 15px;">✦</span>
++                                <p style="margin: 0; color: #E5E5E5; font-size: 15px; line-height: 1.6;">
++                                  <strong style="color: #D4AF37;">First Notification</strong> when we officially launch
++                                </p>
++                              </div>
++                            </td>
++                          </tr>
++                          <tr>
++                            <td style="padding: 12px 0;">
++                              <div style="display: flex; align-items: center;">
++                                <span style="color: #FF6B5A; font-size: 20px; margin-right: 15px;">✦</span>
++                                <p style="margin: 0; color: #E5E5E5; font-size: 15px; line-height: 1.6;">
++                                  <strong style="color: #D4AF37;">Complimentary Consultation</strong> with our concierge team
++                                </p>
++                              </div>
++                            </td>
++                          </tr>
++                          <tr>
++                            <td style="padding: 12px 0;">
++                              <div style="display: flex; align-items: center;">
++                                <span style="color: #FF6B5A; font-size: 20px; margin-right: 15px;">✦</span>
++                                <p style="margin: 0; color: #E5E5E5; font-size: 15px; line-height: 1.6;">
++                                  <strong style="color: #D4AF37;">VIP Treatment</strong> for all your service requests
++                                </p>
++                              </div>
++                            </td>
++                          </tr>
++                        </table>
++                      </div>
++
++                      <p style="color: #AAAAAA; font-size: 16px; line-height: 1.8; margin: 35px 0; text-align: center;">
++                        We're crafting an unparalleled experience in luxury lifestyle management. You'll be among the first to know when we launch.
++                      </p>
++
++                      <!-- CTA Button -->
++                      <div style="text-align: center; margin: 45px 0;">
++                        <a href="https://www.linkedin.com/company/yagoconcierge"
++                           style="display: inline-block; background: linear-gradient(135deg, #FF6B5A 0%, #D4AF37 100%);
++                                  color: #000000; text-decoration: none; padding: 18px 50px;
++                                  font-weight: 700; font-size: 14px; letter-spacing: 3px; text-transform: uppercase;
++                                  border-radius: 50px; box-shadow: 0 10px 30px rgba(255, 107, 90, 0.3);
++                                  transition: all 0.3s ease;">
++                          STAY CONNECTED
++                        </a>
++                      </div>
++
++                      <div style="height: 1px; background: linear-gradient(to right, transparent, #333333, transparent); margin: 40px 0;"></div>
++
++                      <p style="color: #666666; font-size: 13px; text-align: center; margin: 0; font-style: italic; letter-spacing: 1px;">
++                        Crafted with Excellence, Delivered with Passion
++                      </p>
++                    </td>
++                  </tr>
++
++                  <!-- Footer -->
++                  <tr>
++                    <td style="padding: 45px 50px; text-align: center; background: linear-gradient(180deg, #000000 0%, #0A0A0A 100%); border-top: 1px solid #222222;">
++                      <!-- Social Links -->
++                      <div style="margin-bottom: 30px;">
++                        <p style="color: #888888; font-size: 13px; margin: 0 0 20px 0; letter-spacing: 1px;">
++                          CONNECT WITH US
++                        </p>
++                        <div style="display: inline-block;">
++                          <a href="https://www.linkedin.com/company/yagoconcierge" style="display: inline-block; margin: 0 12px; text-decoration: none;">
++                            <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #FF6B5A, #D4AF37); display: flex; align-items: center; justify-content: center;">
++                              <span style="color: #000000; font-weight: bold; font-size: 16px;">in</span>
++                            </div>
++                          </a>
++                          <a href="https://twitter.com/yagoconcierge" style="display: inline-block; margin: 0 12px; text-decoration: none;">
++                            <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #FF6B5A, #D4AF37); display: flex; align-items: center; justify-content: center;">
++                              <span style="color: #000000; font-weight: bold; font-size: 16px;">𝕏</span>
++                            </div>
++                          </a>
++                          <a href="mailto:hello@yago.co.uz" style="display: inline-block; margin: 0 12px; text-decoration: none;">
++                            <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #FF6B5A, #D4AF37); display: flex; align-items: center; justify-content: center;">
++                              <span style="color: #000000; font-weight: bold; font-size: 16px;">✉</span>
++                            </div>
++                          </a>
++                        </div>
++                      </div>
++
++                      <div style="height: 1px; background: linear-gradient(to right, transparent, #333333, transparent); margin: 30px auto; width: 60%;"></div>
++
++                      <!-- Company Info -->
++                      <div style="margin: 25px 0;">
++                        <p style="margin: 0 0 8px 0;">
++                          <span style="font-size: 28px; font-weight: 900; color: #FF6B5A; letter-spacing: 6px; font-family: Arial Black, sans-serif;">YAGO</span>
++                        </p>
++                        <p style="color: #666666; font-size: 11px; margin: 0; letter-spacing: 2px; text-transform: uppercase;">
++                          Luxury Concierge Services
++                        </p>
++                      </div>
++
++                      <div style="margin: 25px 0;">
++                        <p style="color: #555555; font-size: 12px; margin: 0 0 5px 0;">
++                          © ${new Date().getFullYear()} Yago Concierge. All rights reserved.
++                        </p>
++                        <p style="color: #444444; font-size: 11px; margin: 0; line-height: 1.6;">
++                          You're receiving this email because you signed up for early access at yago.co.uz
++                        </p>
++                      </div>
++
++                      <div style="margin-top: 25px; padding: 20px; background-color: #0f0f0f; border-radius: 4px;">
++                        <p style="color: #888888; font-size: 11px; margin: 0 0 10px 0; line-height: 1.6;">
++                          This is a one-time welcome email. You'll only hear from us when we officially launch.
++                        </p>
++                        <p style="color: #666666; font-size: 10px; margin: 0; line-height: 1.6;">
++                          <a href="https://yago.co.uz/privacy" style="color: #888888; text-decoration: none;">Privacy Policy</a>
++                          <span style="color: #444444;"> • </span>
++                          <a href="https://yago.co.uz/terms" style="color: #888888; text-decoration: none;">Terms</a>
++                          <span style="color: #444444;"> • </span>
++                          <a href="mailto:unsubscribe@yago.co.uz?subject=Unsubscribe" style="color: #888888; text-decoration: none;">Unsubscribe</a>
++                        </p>
++                      </div>
++                    </td>
++                  </tr>
++                </table>
++              </td>
++            </tr>
++          </table>
++        </body>
++        </html>
++      `,
++      text: `
++═══════════════════════════════════════
++          Y A G O
++    Luxury Concierge Services
++═══════════════════════════════════════
++
++Welcome, ${recipientName}!
++
++You've joined an exclusive circle.
++
++Thank you for expressing interest in Yago. You've taken the first step toward experiencing luxury concierge services redefined.
++
++───────────────────────────────────────
++    EARLY BIRD BENEFITS
++───────────────────────────────────────
++
++✦ Priority Access to our premium concierge services
++✦ Exclusive Discounts reserved for founding members
++✦ First Notification when we officially launch
++✦ Complimentary Consultation with our concierge team
++✦ VIP Treatment for all your service requests
++
++We're crafting an unparalleled experience in luxury lifestyle management. You'll be among the first to know when we launch.
++
++───────────────────────────────────────
++
++STAY CONNECTED
++https://www.linkedin.com/company/yagoconcierge
++
++───────────────────────────────────────
++
++Crafted with Excellence, Delivered with Passion
++
++© ${new Date().getFullYear()} Yago Concierge. All rights reserved.
++You're receiving this email because you signed up for early access at yago.co.uz
++
++Privacy Policy | Terms of Service | Unsubscribe
++      `,
++    };
++
++    const response = await mg.messages.create(process.env.MAILGUN_DOMAIN, emailData);
++
++    console.log('Welcome email sent successfully:', response);
++    return { success: true, message: 'Email sent successfully', id: response.id };
++  } catch (error) {
++    console.error('Error sending welcome email:', error);
++    return { success: false, message: 'Failed to send email', error };
++  }
++}
++
++// Test email function for admin use
++export async function sendTestEmail(toEmail: string) {
++  return sendWelcomeEmail({ email: toEmail });
++}
+diff --git a/package-lock.json b/package-lock.json
+index 039c445..4d772df 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -10,8 +10,10 @@
+       "dependencies": {
+         "class-variance-authority": "^0.7.1",
+         "clsx": "^2.1.1",
++        "form-data": "^4.0.5",
+         "framer-motion": "^12.23.24",
+         "lucide-react": "^0.553.0",
++        "mailgun.js": "^12.1.1",
+         "next": "^14.2.0",
+         "react": "^18.3.1",
+         "react-dom": "^18.3.1",
+@@ -1416,6 +1418,12 @@
+         "node": ">= 0.4"
+       }
+     },
++    "node_modules/asynckit": {
++      "version": "0.4.0",
++      "resolved": "https://registry.npmjs.org/asynckit/-/asynckit-0.4.0.tgz",
++      "integrity": "sha512-Oei9OH4tRh0YqU3GxhX79dM/mwVgvbZJaSNaRk+bshkj0S5cfHcgYakreBjrHwatXKbz+IoIdYLxrKim2MjW0Q==",
++      "license": "MIT"
++    },
+     "node_modules/autoprefixer": {
+       "version": "10.4.22",
+       "resolved": "https://registry.npmjs.org/autoprefixer/-/autoprefixer-10.4.22.tgz",
+@@ -1480,6 +1488,17 @@
+         "node": ">=4"
+       }
+     },
++    "node_modules/axios": {
++      "version": "1.13.2",
++      "resolved": "https://registry.npmjs.org/axios/-/axios-1.13.2.tgz",
++      "integrity": "sha512-VPk9ebNqPcy5lRGuSlKx752IlDatOjT9paPlm8A7yOuW2Fbvp4X3JznJtT4f0GzGLLiWE9W8onz51SqLYwzGaA==",
++      "license": "MIT",
++      "dependencies": {
++        "follow-redirects": "^1.15.6",
++        "form-data": "^4.0.4",
++        "proxy-from-env": "^1.1.0"
++      }
++    },
+     "node_modules/axobject-query": {
+       "version": "4.1.0",
+       "resolved": "https://registry.npmjs.org/axobject-query/-/axobject-query-4.1.0.tgz",
+@@ -1497,6 +1516,12 @@
+       "dev": true,
+       "license": "MIT"
+     },
++    "node_modules/base-64": {
++      "version": "1.0.0",
++      "resolved": "https://registry.npmjs.org/base-64/-/base-64-1.0.0.tgz",
++      "integrity": "sha512-kwDPIFCGx0NZHog36dj+tHiwP4QMzsZ3AgMViUBKI0+V5n4U0ufTCUMhnQ04diaRI8EX/QcPfql7zlhZ7j4zgg==",
++      "license": "MIT"
++    },
+     "node_modules/baseline-browser-mapping": {
+       "version": "2.8.28",
+       "resolved": "https://registry.npmjs.org/baseline-browser-mapping/-/baseline-browser-mapping-2.8.28.tgz",
+@@ -1612,7 +1637,6 @@
+       "version": "1.0.2",
+       "resolved": "https://registry.npmjs.org/call-bind-apply-helpers/-/call-bind-apply-helpers-1.0.2.tgz",
+       "integrity": "sha512-Sp1ablJ0ivDkSzjcaJdxEunN5/XvksFJ2sMBFfq6x0ryhQV/2b/KwFe21cMpmHtPOSij8K99/wSfoEuTObmuMQ==",
+-      "dev": true,
+       "license": "MIT",
+       "dependencies": {
+         "es-errors": "^1.3.0",
+@@ -1781,6 +1805,18 @@
+       "dev": true,
+       "license": "MIT"
+     },
++    "node_modules/combined-stream": {
++      "version": "1.0.8",
++      "resolved": "https://registry.npmjs.org/combined-stream/-/combined-stream-1.0.8.tgz",
++      "integrity": "sha512-FQN4MRfuJeHf7cBbBMJFXhKSDq+2kAArBlmRBvcvFE5BB1HZKXtSFASDhdlz9zOYwxh8lDdnvmMOe/+5cdoEdg==",
++      "license": "MIT",
++      "dependencies": {
++        "delayed-stream": "~1.0.0"
++      },
++      "engines": {
++        "node": ">= 0.8"
++      }
++    },
+     "node_modules/commander": {
+       "version": "4.1.1",
+       "resolved": "https://registry.npmjs.org/commander/-/commander-4.1.1.tgz",
+@@ -1955,6 +1991,15 @@
+         "url": "https://github.com/sponsors/ljharb"
+       }
+     },
++    "node_modules/delayed-stream": {
++      "version": "1.0.0",
++      "resolved": "https://registry.npmjs.org/delayed-stream/-/delayed-stream-1.0.0.tgz",
++      "integrity": "sha512-ZySD7Nf91aLB0RxL4KGrKHBXl7Eds1DAmEdcoVawXnLD7SDhpNgtuII2aAkg7a7QS41jxPSZ17p4VdGnMHk3MQ==",
++      "license": "MIT",
++      "engines": {
++        "node": ">=0.4.0"
++      }
++    },
+     "node_modules/didyoumean": {
+       "version": "1.2.2",
+       "resolved": "https://registry.npmjs.org/didyoumean/-/didyoumean-1.2.2.tgz",
+@@ -1986,7 +2031,6 @@
+       "version": "1.0.1",
+       "resolved": "https://registry.npmjs.org/dunder-proto/-/dunder-proto-1.0.1.tgz",
+       "integrity": "sha512-KIN/nDJBQRcXw0MLVhZE9iQHmG68qAVIBg9CqmUYjmQIhgij9U5MFvrqkUL5FbtyyzZuOeOt0zdeRe4UY7ct+A==",
+-      "dev": true,
+       "license": "MIT",
+       "dependencies": {
+         "call-bind-apply-helpers": "^1.0.1",
+@@ -2091,7 +2135,6 @@
+       "version": "1.0.1",
+       "resolved": "https://registry.npmjs.org/es-define-property/-/es-define-property-1.0.1.tgz",
+       "integrity": "sha512-e3nRfgfUZ4rNGL232gUgX06QNyyez04KdjFrF+LTRoOXmrOgFKDg4BCdsjW8EnT69eqdYGmRpJwiPVYNrCaW3g==",
+-      "dev": true,
+       "license": "MIT",
+       "engines": {
+         "node": ">= 0.4"
+@@ -2101,7 +2144,6 @@
+       "version": "1.3.0",
+       "resolved": "https://registry.npmjs.org/es-errors/-/es-errors-1.3.0.tgz",
+       "integrity": "sha512-Zf5H2Kxt2xjTvbJvP2ZWLEICxA6j+hAmMzIlypy4xcBg1vKVnx89Wy0GbS+kf5cwCVFFzdCFh2XSCFNULS6csw==",
+-      "dev": true,
+       "license": "MIT",
+       "engines": {
+         "node": ">= 0.4"
+@@ -2139,7 +2181,6 @@
+       "version": "1.1.1",
+       "resolved": "https://registry.npmjs.org/es-object-atoms/-/es-object-atoms-1.1.1.tgz",
+       "integrity": "sha512-FGgH2h8zKNim9ljj7dankFPcICIK9Cp5bm+c2gQSYePhpaG5+esrLODihIorn+Pe6FGJzWhXQotPv73jTaldXA==",
+-      "dev": true,
+       "license": "MIT",
+       "dependencies": {
+         "es-errors": "^1.3.0"
+@@ -2152,7 +2193,6 @@
+       "version": "2.1.0",
+       "resolved": "https://registry.npmjs.org/es-set-tostringtag/-/es-set-tostringtag-2.1.0.tgz",
+       "integrity": "sha512-j6vWzfrGVfyXxge+O0x5sh6cvxAog0a/4Rdd2K36zCMV5eJ+/+tOAngRO8cODMNWbVRdVlmGZQL2YS3yR8bIUA==",
+-      "dev": true,
+       "license": "MIT",
+       "dependencies": {
+         "es-errors": "^1.3.0",
+@@ -2792,6 +2832,26 @@
+       "dev": true,
+       "license": "ISC"
+     },
++    "node_modules/follow-redirects": {
++      "version": "1.15.11",
++      "resolved": "https://registry.npmjs.org/follow-redirects/-/follow-redirects-1.15.11.tgz",
++      "integrity": "sha512-deG2P0JfjrTxl50XGCDyfI97ZGVCxIpfKYmfyrQ54n5FO/0gfIES8C/Psl6kWVDolizcaaxZJnTS0QSMxvnsBQ==",
++      "funding": [
++        {
++          "type": "individual",
++          "url": "https://github.com/sponsors/RubenVerborgh"
++        }
++      ],
++      "license": "MIT",
++      "engines": {
++        "node": ">=4.0"
++      },
++      "peerDependenciesMeta": {
++        "debug": {
++          "optional": true
++        }
++      }
++    },
+     "node_modules/for-each": {
+       "version": "0.3.5",
+       "resolved": "https://registry.npmjs.org/for-each/-/for-each-0.3.5.tgz",
+@@ -2825,6 +2885,22 @@
+         "url": "https://github.com/sponsors/isaacs"
+       }
+     },
++    "node_modules/form-data": {
++      "version": "4.0.5",
++      "resolved": "https://registry.npmjs.org/form-data/-/form-data-4.0.5.tgz",
++      "integrity": "sha512-8RipRLol37bNs2bhoV67fiTEvdTrbMUYcFTiy3+wuuOnUog2QBHCZWXDRijWQfAkhBj2Uf5UnVaiWwA5vdd82w==",
++      "license": "MIT",
++      "dependencies": {
++        "asynckit": "^0.4.0",
++        "combined-stream": "^1.0.8",
++        "es-set-tostringtag": "^2.1.0",
++        "hasown": "^2.0.2",
++        "mime-types": "^2.1.12"
++      },
++      "engines": {
++        "node": ">= 6"
++      }
++    },
+     "node_modules/fraction.js": {
+       "version": "5.3.4",
+       "resolved": "https://registry.npmjs.org/fraction.js/-/fraction.js-5.3.4.tgz",
+@@ -2892,7 +2968,6 @@
+       "version": "1.1.2",
+       "resolved": "https://registry.npmjs.org/function-bind/-/function-bind-1.1.2.tgz",
+       "integrity": "sha512-7XHNxH7qX9xG5mIwxkhumTox/MIRNcOgDrxWsMt2pAr23WHp6MrRlN7FBSFpCpr+oVO0F744iUgR82nJMfG2SA==",
+-      "dev": true,
+       "license": "MIT",
+       "funding": {
+         "url": "https://github.com/sponsors/ljharb"
+@@ -2943,7 +3018,6 @@
+       "version": "1.3.0",
+       "resolved": "https://registry.npmjs.org/get-intrinsic/-/get-intrinsic-1.3.0.tgz",
+       "integrity": "sha512-9fSjSaos/fRIVIp+xSJlE6lfwhES7LNtKaCBIamHsjr2na1BiABJPo0mOjjz8GJDURarmCPGqaiVg5mfjb98CQ==",
+-      "dev": true,
+       "license": "MIT",
+       "dependencies": {
+         "call-bind-apply-helpers": "^1.0.2",
+@@ -2968,7 +3042,6 @@
+       "version": "1.0.1",
+       "resolved": "https://registry.npmjs.org/get-proto/-/get-proto-1.0.1.tgz",
+       "integrity": "sha512-sTSfBjoXBp89JvIKIefqw7U2CCebsc74kiY6awiGogKtoSGbgjYE/G/+l9sF3MWFPNc9IcoOC4ODfKHfxFmp0g==",
+-      "dev": true,
+       "license": "MIT",
+       "dependencies": {
+         "dunder-proto": "^1.0.1",
+@@ -3108,7 +3181,6 @@
+       "version": "1.2.0",
+       "resolved": "https://registry.npmjs.org/gopd/-/gopd-1.2.0.tgz",
+       "integrity": "sha512-ZUKRh6/kUFoAiTAtTYPZJ3hw9wNxx+BIBOijnlG9PnrJsCcSjs1wyyD6vJpaYtgnzDrKYRSqf3OO6Rfa93xsRg==",
+-      "dev": true,
+       "license": "MIT",
+       "engines": {
+         "node": ">= 0.4"
+@@ -3186,7 +3258,6 @@
+       "version": "1.1.0",
+       "resolved": "https://registry.npmjs.org/has-symbols/-/has-symbols-1.1.0.tgz",
+       "integrity": "sha512-1cDNdwJ2Jaohmb3sg4OmKaMBwuC48sYni5HUw2DvsC8LjGTLK9h+eb1X6RyuOHe4hT0ULCW68iomhjUoKUqlPQ==",
+-      "dev": true,
+       "license": "MIT",
+       "engines": {
+         "node": ">= 0.4"
+@@ -3199,7 +3270,6 @@
+       "version": "1.0.2",
+       "resolved": "https://registry.npmjs.org/has-tostringtag/-/has-tostringtag-1.0.2.tgz",
+       "integrity": "sha512-NqADB8VjPFLM2V0VvHUewwwsw0ZWBaIdgo+ieHtK3hasLz4qeCRjYcqfB6AQrBggRKppKF8L52/VqdVsO47Dlw==",
+-      "dev": true,
+       "license": "MIT",
+       "dependencies": {
+         "has-symbols": "^1.0.3"
+@@ -3215,7 +3285,6 @@
+       "version": "2.0.2",
+       "resolved": "https://registry.npmjs.org/hasown/-/hasown-2.0.2.tgz",
+       "integrity": "sha512-0hJU9SCPvmMzIBdZFqNPXWa6dqh7WdH0cII9y+CyS8rG3nL48Bclra9HmKhVVUHyPWNH5Y7xDwAB7bfgSjkUMQ==",
+-      "dev": true,
+       "license": "MIT",
+       "dependencies": {
+         "function-bind": "^1.1.2"
+@@ -3975,11 +4044,24 @@
+         "react": "^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0"
+       }
+     },
++    "node_modules/mailgun.js": {
++      "version": "12.1.1",
++      "resolved": "https://registry.npmjs.org/mailgun.js/-/mailgun.js-12.1.1.tgz",
++      "integrity": "sha512-8E6JaEPCurhDLu77LFJcB1AwDmGd1Y99hEJBC+BqZSUal6qOJrOzZBEjP1EALI2VLbOXs7OWq4lsmUqRDd1LVA==",
++      "license": "MIT",
++      "dependencies": {
++        "axios": "^1.12.1",
++        "base-64": "^1.0.0",
++        "url-join": "^4.0.1"
++      },
++      "engines": {
++        "node": ">=18.0.0"
++      }
++    },
+     "node_modules/math-intrinsics": {
+       "version": "1.1.0",
+       "resolved": "https://registry.npmjs.org/math-intrinsics/-/math-intrinsics-1.1.0.tgz",
+       "integrity": "sha512-/IXtbwEk5HTPyEwyKX6hGkYXxM9nbj64B+ilVJnC/R6B0pH5G4V3b0pVbL7DBj4tkhBAppbQUlf6F6Xl9LHu1g==",
+-      "dev": true,
+       "license": "MIT",
+       "engines": {
+         "node": ">= 0.4"
+@@ -4009,6 +4091,27 @@
+         "node": ">=8.6"
+       }
+     },
++    "node_modules/mime-db": {
++      "version": "1.52.0",
++      "resolved": "https://registry.npmjs.org/mime-db/-/mime-db-1.52.0.tgz",
++      "integrity": "sha512-sPU4uV7dYlvtWJxwwxHD0PuihVNiE7TyAbQ5SWxDCB9mUYvOgroQOwYQQOKPJ8CIbE+1ETVlOoK1UC2nU3gYvg==",
++      "license": "MIT",
++      "engines": {
++        "node": ">= 0.6"
++      }
++    },
++    "node_modules/mime-types": {
++      "version": "2.1.35",
++      "resolved": "https://registry.npmjs.org/mime-types/-/mime-types-2.1.35.tgz",
++      "integrity": "sha512-ZDY+bPm5zTTF+YpCrAU9nK0UgICYPT0QtT1NZWFv4s++TNkcgVaT0g6+4R2uI4MjQjzysHB1zxuWL50hzaeXiw==",
++      "license": "MIT",
++      "dependencies": {
++        "mime-db": "1.52.0"
++      },
++      "engines": {
++        "node": ">= 0.6"
++      }
++    },
+     "node_modules/minimatch": {
+       "version": "3.1.2",
+       "resolved": "https://registry.npmjs.org/minimatch/-/minimatch-3.1.2.tgz",
+@@ -4734,6 +4837,12 @@
+         "react-is": "^16.13.1"
+       }
+     },
++    "node_modules/proxy-from-env": {
++      "version": "1.1.0",
++      "resolved": "https://registry.npmjs.org/proxy-from-env/-/proxy-from-env-1.1.0.tgz",
++      "integrity": "sha512-D+zkORCbA9f1tdWRK0RaCR3GPv50cMxcrz4X8k5LTSUD1Dkw47mKJEZQNunItRTkWwgtaUSo1RVFRIG9ZXiFYg==",
++      "license": "MIT"
++    },
+     "node_modules/punycode": {
+       "version": "2.3.1",
+       "resolved": "https://registry.npmjs.org/punycode/-/punycode-2.3.1.tgz",
+@@ -5958,6 +6067,12 @@
+         "punycode": "^2.1.0"
+       }
+     },
++    "node_modules/url-join": {
++      "version": "4.0.1",
++      "resolved": "https://registry.npmjs.org/url-join/-/url-join-4.0.1.tgz",
++      "integrity": "sha512-jk1+QP6ZJqyOiuEI9AEWQfju/nB2Pw466kbA0LEZljHwKeMgd9WrAEgEGxjPDD2+TNbbb37rTyhEfrCXfuKXnA==",
++      "license": "MIT"
++    },
+     "node_modules/util-deprecate": {
+       "version": "1.0.2",
+       "resolved": "https://registry.npmjs.org/util-deprecate/-/util-deprecate-1.0.2.tgz",
+diff --git a/package.json b/package.json
+index 346eb1f..e8d9ff9 100644
+--- a/package.json
++++ b/package.json
+@@ -11,8 +11,10 @@
+   "dependencies": {
+     "class-variance-authority": "^0.7.1",
+     "clsx": "^2.1.1",
++    "form-data": "^4.0.5",
+     "framer-motion": "^12.23.24",
+     "lucide-react": "^0.553.0",
++    "mailgun.js": "^12.1.1",
+     "next": "^14.2.0",
+     "react": "^18.3.1",
+     "react-dom": "^18.3.1",
+diff --git a/vercel.json b/vercel.json
+new file mode 100644
+index 0000000..beed434
+--- /dev/null
++++ b/vercel.json
+@@ -0,0 +1,6 @@
++{
++  "buildCommand": "npm run build",
++  "devCommand": "npm run dev",
++  "installCommand": "npm install",
++  "framework": "nextjs"
++}
