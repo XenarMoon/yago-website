@@ -624,7 +624,7 @@ export default function ComingSoon() {
               <div className="absolute bottom-2 left-3 w-2 h-2 border-b-2 border-l-2 border-[#FF6B5A]/40" />
               <div className="absolute bottom-2 right-3 w-2 h-2 border-b-2 border-r-2 border-[#FF6B5A]/40" />
 
-              <div className="flex items-center gap-1.5 md:gap-3 flex-wrap justify-center">
+              <div className="flex items-center gap-1 md:gap-2 whitespace-nowrap">
                 {/* Animated rocket icon */}
                 <motion.div
                   animate={{
@@ -642,18 +642,18 @@ export default function ComingSoon() {
                     transition={{ duration: 1.5, repeat: Infinity }}
                     className="absolute inset-0 bg-[#FF6B5A]/30 rounded-full blur-md"
                   />
-                  <Rocket className="w-3.5 h-3.5 md:w-5 md:h-5 text-[#FF6B5A] relative z-10" />
+                  <Rocket className="w-3 h-3 md:w-5 md:h-5 text-[#FF6B5A] relative z-10" />
                 </motion.div>
 
                 {/* Vertical divider with animation */}
                 <motion.div
                   animate={{ scaleY: [1, 1.2, 1] }}
                   transition={{ duration: 2, repeat: Infinity }}
-                  className="hidden sm:block w-px h-5 md:h-6 bg-gradient-to-b from-transparent via-[#FF6B5A]/50 to-transparent flex-shrink-0"
+                  className="w-px h-4 md:h-6 bg-gradient-to-b from-transparent via-[#FF6B5A]/50 to-transparent flex-shrink-0"
                 />
 
                 {/* Text with gradient */}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-gray-400 text-[10px] sm:text-xs md:text-sm font-semibold tracking-wide text-center leading-tight">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-gray-400 text-[8px] sm:text-[10px] md:text-sm font-semibold tracking-wide whitespace-nowrap">
                   {t.badge.text}
                 </span>
 
@@ -661,20 +661,20 @@ export default function ComingSoon() {
                 <motion.div
                   animate={{ scaleY: [1, 1.2, 1] }}
                   transition={{ duration: 2, repeat: Infinity, delay: 1 }}
-                  className="hidden sm:block w-px h-5 md:h-6 bg-gradient-to-b from-transparent via-[#FF6B5A]/50 to-transparent flex-shrink-0"
+                  className="w-px h-4 md:h-6 bg-gradient-to-b from-transparent via-[#FF6B5A]/50 to-transparent flex-shrink-0"
                 />
 
                 {/* Premium badge chip */}
                 <motion.div
                   whileHover={{ scale: 1.1 }}
-                  className="relative px-2 md:px-3 py-0.5 md:py-1 bg-gradient-to-r from-[#FF6B5A] to-[#FF8A7A] rounded-full flex-shrink-0"
+                  className="relative px-1.5 md:px-3 py-0.5 md:py-1 bg-gradient-to-r from-[#FF6B5A] to-[#FF8A7A] rounded-full flex-shrink-0"
                 >
                   <motion.div
                     animate={{ opacity: [0.5, 0.8, 0.5] }}
                     transition={{ duration: 2, repeat: Infinity }}
                     className="absolute inset-0 bg-white/20 rounded-full"
                   />
-                  <span className="relative z-10 text-black text-[9px] sm:text-[10px] md:text-xs font-black tracking-wider whitespace-nowrap">
+                  <span className="relative z-10 text-black text-[8px] sm:text-[9px] md:text-xs font-black tracking-wider whitespace-nowrap">
                     {t.badge.chip}
                   </span>
                 </motion.div>
