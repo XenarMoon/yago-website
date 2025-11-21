@@ -624,7 +624,7 @@ export default function ComingSoon() {
               <div className="absolute bottom-2 left-3 w-2 h-2 border-b-2 border-l-2 border-[#FF6B5A]/40" />
               <div className="absolute bottom-2 right-3 w-2 h-2 border-b-2 border-r-2 border-[#FF6B5A]/40" />
 
-              <div className="flex items-center gap-2 md:gap-3">
+              <div className="flex items-center gap-1.5 md:gap-3 flex-wrap justify-center">
                 {/* Animated rocket icon */}
                 <motion.div
                   animate={{
@@ -632,7 +632,7 @@ export default function ComingSoon() {
                     rotate: [0, 5, 0, -5, 0]
                   }}
                   transition={{ duration: 2.5, repeat: Infinity }}
-                  className="relative"
+                  className="relative flex-shrink-0"
                 >
                   <motion.div
                     animate={{
@@ -642,18 +642,18 @@ export default function ComingSoon() {
                     transition={{ duration: 1.5, repeat: Infinity }}
                     className="absolute inset-0 bg-[#FF6B5A]/30 rounded-full blur-md"
                   />
-                  <Rocket className="w-4 h-4 md:w-5 md:h-5 text-[#FF6B5A] relative z-10" />
+                  <Rocket className="w-3.5 h-3.5 md:w-5 md:h-5 text-[#FF6B5A] relative z-10" />
                 </motion.div>
 
                 {/* Vertical divider with animation */}
                 <motion.div
                   animate={{ scaleY: [1, 1.2, 1] }}
                   transition={{ duration: 2, repeat: Infinity }}
-                  className="w-px h-5 md:h-6 bg-gradient-to-b from-transparent via-[#FF6B5A]/50 to-transparent"
+                  className="hidden sm:block w-px h-5 md:h-6 bg-gradient-to-b from-transparent via-[#FF6B5A]/50 to-transparent flex-shrink-0"
                 />
 
                 {/* Text with gradient */}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-gray-400 text-xs md:text-sm font-semibold tracking-wide">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-gray-400 text-[10px] sm:text-xs md:text-sm font-semibold tracking-wide text-center leading-tight">
                   {t.badge.text}
                 </span>
 
@@ -661,20 +661,20 @@ export default function ComingSoon() {
                 <motion.div
                   animate={{ scaleY: [1, 1.2, 1] }}
                   transition={{ duration: 2, repeat: Infinity, delay: 1 }}
-                  className="w-px h-5 md:h-6 bg-gradient-to-b from-transparent via-[#FF6B5A]/50 to-transparent"
+                  className="hidden sm:block w-px h-5 md:h-6 bg-gradient-to-b from-transparent via-[#FF6B5A]/50 to-transparent flex-shrink-0"
                 />
 
                 {/* Premium badge chip */}
                 <motion.div
                   whileHover={{ scale: 1.1 }}
-                  className="relative px-2 md:px-3 py-0.5 md:py-1 bg-gradient-to-r from-[#FF6B5A] to-[#FF8A7A] rounded-full"
+                  className="relative px-2 md:px-3 py-0.5 md:py-1 bg-gradient-to-r from-[#FF6B5A] to-[#FF8A7A] rounded-full flex-shrink-0"
                 >
                   <motion.div
                     animate={{ opacity: [0.5, 0.8, 0.5] }}
                     transition={{ duration: 2, repeat: Infinity }}
                     className="absolute inset-0 bg-white/20 rounded-full"
                   />
-                  <span className="relative z-10 text-black text-[10px] md:text-xs font-black tracking-wider">
+                  <span className="relative z-10 text-black text-[9px] sm:text-[10px] md:text-xs font-black tracking-wider whitespace-nowrap">
                     {t.badge.chip}
                   </span>
                 </motion.div>
@@ -694,15 +694,15 @@ export default function ComingSoon() {
         </motion.div>
 
         {/* Language Switcher - Top Right */}
-        <div className="fixed top-8 right-8 z-50">
+        <div className="fixed top-20 md:top-8 right-4 md:right-8 z-50">
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={toggleLanguage}
-            className="px-6 py-3 bg-white/5 border border-white/10 hover:border-[#FF6B5A] backdrop-blur-xl transition-all duration-300 flex items-center gap-2 group"
+            className="px-4 md:px-6 py-2 md:py-3 bg-white/5 border border-white/10 hover:border-[#FF6B5A] backdrop-blur-xl transition-all duration-300 flex items-center gap-2 group rounded-full"
           >
             <Languages className="w-4 h-4 text-[#FF6B5A]" />
-            <span className="font-medium">{language.toUpperCase()}</span>
+            <span className="font-medium text-sm md:text-base">{language.toUpperCase()}</span>
           </motion.button>
         </div>
 
