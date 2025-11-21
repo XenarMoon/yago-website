@@ -561,7 +561,7 @@ export default function ComingSoon() {
             scale: badgeScale
           }}
           transition={{ duration: 1, delay: 0.3, type: "spring", stiffness: 100 }}
-          className="fixed top-4 md:top-6 left-1/2 -translate-x-1/2 z-40 max-w-[calc(100vw-2rem)] px-2"
+          className="fixed top-4 md:top-6 left-4 md:left-1/2 md:-translate-x-1/2 z-40 max-w-[calc(100vw-2rem)] px-2"
         >
           <motion.div
             animate={{
