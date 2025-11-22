@@ -150,7 +150,7 @@ export default function DemoAccessModal({ isOpen, onClose }: DemoAccessModalProp
           {/* Ask for Access Code */}
           <div className="mt-6 p-4 bg-gray-50 border border-gray-200 rounded-lg text-center">
             <p className="text-sm text-gray-700 mb-2">
-              Don't have an access code?
+              Don&apos;t have an access code?
             </p>
             <a
               href="https://T.me/officialyago"
