@@ -14,33 +14,18 @@ export default function Logo({ className, variant = 'gold' }: LogoProps) {
 
   return (
     <div className={cn('flex items-center gap-2', className)}>
-      {/* Logo Icon */}
+      {/* Yago Favicon Logo */}
       <svg
         width="40"
         height="40"
-        viewBox="0 0 40 40"
+        viewBox="0 0 32 32"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
-        className={colorClasses[variant]}
       >
-        <path
-          d="M20 4L4 12V20C4 29 10 36 20 36C30 36 36 29 36 20V12L20 4Z"
-          fill="currentColor"
-          fillOpacity="0.2"
-        />
-        <path
-          d="M20 4L4 12V20C4 29 10 36 20 36C30 36 36 29 36 20V12L20 4Z"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        <path
-          d="M20 14V26M14 20H26"
-          stroke="currentColor"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-        />
+        <rect width="32" height="32" rx="6" fill="#F59E0B"/>
+        <path d="M16 8L8 12V16C8 21.5 11.5 26 16 26C20.5 26 24 21.5 24 16V12L16 8Z" fill="white" fillOpacity="0.3"/>
+        <path d="M16 8L8 12V16C8 21.5 11.5 26 16 26C20.5 26 24 21.5 24 16V12L16 8Z" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M16 12V20M12 16H20" stroke="white" strokeWidth="2" strokeLinecap="round"/>
       </svg>
 
       {/* Logo Text */}

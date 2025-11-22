@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "generate:demo": "node scripts/generate-demo-code.js",
+    "list:demos": "node -e \"console.log(JSON.stringify(require('./data/demo-codes.json'), null, 2))\""
   },
   "dependencies": {
     "@vercel/speed-insights": "^1.2.0",
