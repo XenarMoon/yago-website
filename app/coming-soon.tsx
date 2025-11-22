@@ -9,7 +9,6 @@ import {
   Music, ShieldAlert, GraduationCap, Stethoscope, Languages, Rocket, Sparkles
 } from 'lucide-react';
 import SuccessModal from '@/components/SuccessModal';
-import DemoAccessModal from '@/components/DemoAccessModal';
 import { BenefitCard } from '@/components/BenefitCard';
 import { FeatureCard } from '@/components/FeatureCard';
 import { FAQItem } from '@/components/FAQItem';
@@ -277,7 +276,6 @@ export default function ComingSoon() {
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const [showDemoModal, setShowDemoModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [language, setLanguage] = useState<Language>('en');
   const [pageLoaded, setPageLoaded] = useState(false);
@@ -1037,22 +1035,10 @@ export default function ComingSoon() {
                 ))}
               </div>
 
-              <motion.button
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  console.log('Demo button clicked, opening modal...');
-                  setShowDemoModal(true);
-                }}
-                onTouchEnd={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  console.log('Demo button touched (mobile), opening modal...');
-                  setShowDemoModal(true);
-                }}
+              <motion.a
+                href="http://localhost:3005/demo/access"
                 whileHover={{ scale: 1.05, boxShadow: "0 0 40px rgba(255,107,90,0.6)" }}
                 className="relative px-12 md:px-16 py-5 md:py-6 bg-gradient-to-r from-[#FF6B5A] to-[#FF8A7A] hover:from-[#FF8A7A] hover:to-[#FF6B5A] text-black text-lg md:text-xl font-bold transition-all duration-500 inline-flex items-center gap-3 md:gap-4 overflow-hidden group cursor-pointer touch-manipulation"
-                type="button"
               >
                 {/* Animated background shimmer */}
                 <motion.div
@@ -1094,7 +1080,7 @@ export default function ComingSoon() {
 
                 <span className="relative z-10">{t.premium.button}</span>
                 <ArrowUpRight className="relative z-10 w-5 h-5 md:w-6 md:h-6 group-hover:rotate-45 transition-transform duration-300" />
-              </motion.button>
+              </motion.a>
             </div>
           </div>
         </motion.section>
@@ -1153,7 +1139,6 @@ export default function ComingSoon() {
       </div>
 
       <SuccessModal isOpen={showModal} onClose={() => setShowModal(false)} />
-      <DemoAccessModal isOpen={showDemoModal} onClose={() => setShowDemoModal(false)} />
 
       <style jsx global>{`
         @keyframes glitch {
