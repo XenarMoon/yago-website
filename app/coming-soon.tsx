@@ -1036,7 +1036,7 @@ export default function ComingSoon() {
               </div>
 
               <motion.a
-                href="http://localhost:3005/demo/access"
+                href={process.env.NEXT_PUBLIC_WEBAPP_URL || "http://localhost:3005/demo/access"}
                 whileHover={{ scale: 1.05, boxShadow: "0 0 40px rgba(255,107,90,0.6)" }}
                 className="relative px-12 md:px-16 py-5 md:py-6 bg-gradient-to-r from-[#FF6B5A] to-[#FF8A7A] hover:from-[#FF8A7A] hover:to-[#FF6B5A] text-black text-lg md:text-xl font-bold transition-all duration-500 inline-flex items-center gap-3 md:gap-4 overflow-hidden group cursor-pointer touch-manipulation"
               >
