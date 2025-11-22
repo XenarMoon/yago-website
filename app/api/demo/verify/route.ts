@@ -15,8 +15,18 @@ interface CodesData {
 }
 
 function loadCodes(): CodesData {
-  const codesFile = path.join(process.cwd(), 'data', 'demo-codes.json');
+  // Try environment variable first (production)
+  const envCodes = process.env.DEMO_CODES;
+  if (envCodes) {
+    try {
+      return JSON.parse(envCodes);
+    } catch (error) {
+      console.error('Error parsing DEMO_CODES env var:', error);
+    }
+  }
 
+  // Fallback to file (development)
+  const codesFile = path.join(process.cwd(), 'data', 'demo-codes.json');
   try {
     if (fs.existsSync(codesFile)) {
       const data = fs.readFileSync(codesFile, 'utf8');
@@ -30,6 +40,13 @@ function loadCodes(): CodesData {
 }
 
 function saveCodes(data: CodesData) {
+  // In production with env vars, we can't save (read-only)
+  if (process.env.DEMO_CODES) {
+    console.warn('Cannot save codes in production with env vars');
+    return;
+  }
+
+  // Save to file in development
   const dataDir = path.join(process.cwd(), 'data');
   const codesFile = path.join(dataDir, 'demo-codes.json');
 
