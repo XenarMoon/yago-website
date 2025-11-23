@@ -22,7 +22,9 @@ export const metadata: Metadata = {
   keywords: ['luxury', 'premium', 'AI concierge', 'personal assistant', 'lifestyle management', 'concierge service', 'virtual assistant', 'Yago'],
   authors: [{ name: 'Yago Team' }],
   icons: {
-    icon: '/logo.png',
+    icon: [
+      { url: '/icon.svg', type: 'image/svg+xml' },
+    ],
     apple: '/logo.png',
   },
   openGraph: {
