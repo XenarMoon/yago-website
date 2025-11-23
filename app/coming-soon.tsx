@@ -1091,7 +1091,7 @@ export default function ComingSoon() {
                 transition={{ delay: 0.3 }}
                 className="mt-8 text-center"
               >
-                <p className="text-gray-400 mb-4">Can't access? Request demo via Telegram:</p>
+                <p className="text-gray-400 mb-4">Can&apos;t access? Request demo via Telegram:</p>
                 <a
                   href="https://T.me/officialyago"
                   target="_blank"
