@@ -1155,7 +1155,32 @@ export default function ComingSoon() {
               </a>
 
               <div className="text-gray-600 text-sm text-center md:text-right">
-                {t.footer.copyright}
+                <div className="flex flex-col gap-2">
+                  <div>© 2025 YAGO Concierge</div>
+                  <a
+                    href="https://natex.io"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 text-gray-500 hover:text-[#FF6B5A] transition-all duration-300 group"
+                  >
+                    <span className="text-xs">Powered by</span>
+                    <span className="font-semibold bg-gradient-to-r from-[#FF6B5A] to-[#FF8A7A] bg-clip-text text-transparent group-hover:from-[#FF8A7A] group-hover:to-[#FF6B5A] transition-all duration-500">
+                      Natex Labs
+                    </span>
+                    <span className="text-xs">×</span>
+                    <span className="font-semibold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent group-hover:from-purple-400 group-hover:to-blue-400 transition-all duration-500">
+                      AI
+                    </span>
+                    <svg
+                      className="w-3 h-3 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-300"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                  </a>
+                </div>
               </div>
             </div>
           </div>
