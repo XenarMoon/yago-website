@@ -1036,7 +1036,9 @@ export default function ComingSoon() {
               </div>
 
               <motion.a
-                href={process.env.NEXT_PUBLIC_WEBAPP_URL || "http://localhost:3005/demo/access"}
+                href="https://figural-dara-impedingly.ngrok-free.dev/chat"
+                target="_blank"
+                rel="noopener noreferrer"
                 whileHover={{ scale: 1.05, boxShadow: "0 0 40px rgba(255,107,90,0.6)" }}
                 className="relative px-12 md:px-16 py-5 md:py-6 bg-gradient-to-r from-[#FF6B5A] to-[#FF8A7A] hover:from-[#FF8A7A] hover:to-[#FF6B5A] text-black text-lg md:text-xl font-bold transition-all duration-500 inline-flex items-center gap-3 md:gap-4 overflow-hidden group cursor-pointer touch-manipulation"
               >
@@ -1081,6 +1083,28 @@ export default function ComingSoon() {
                 <span className="relative z-10">{t.premium.button}</span>
                 <ArrowUpRight className="relative z-10 w-5 h-5 md:w-6 md:h-6 group-hover:rotate-45 transition-transform duration-300" />
               </motion.a>
+
+              {/* Telegram Fallback Button */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="mt-8 text-center"
+              >
+                <p className="text-gray-400 mb-4">Can't access? Request demo via Telegram:</p>
+                <a
+                  href="https://T.me/officialyago"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-3 px-8 py-4 border-2 border-[#FF6B5A]/30 hover:border-[#FF6B5A] text-white hover:bg-[#FF6B5A]/10 transition-all duration-300 rounded-sm group"
+                >
+                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.161c-.18 1.897-.962 6.502-1.359 8.627-.168.9-.5 1.201-.82 1.23-.697.064-1.226-.461-1.901-.903-1.056-.693-1.653-1.124-2.678-1.8-1.185-.781-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.139-5.062 3.345-.479.329-.913.489-1.302.481-.428-.008-1.252-.241-1.865-.44-.752-.244-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635.099-.002.321.023.465.141.121.099.155.233.171.326.016.093.036.306.02.472z"/>
+                  </svg>
+                  <span className="font-medium">@officialyago</span>
+                  <ArrowUpRight className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                </a>
+              </motion.div>
             </div>
           </div>
         </motion.section>

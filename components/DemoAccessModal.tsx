@@ -37,7 +37,8 @@ export default function DemoAccessModal({ isOpen, onClose }: DemoAccessModalProp
       }
 
       // Success! Redirect to webapp with demo token
-      const webappUrl = new URL('http://localhost:3005/chat');
+      // Use current origin for ngrok compatibility
+      const webappUrl = new URL('/chat', window.location.origin);
       webappUrl.searchParams.set('demo', 'true');
       webappUrl.searchParams.set('token', data.token);
 
