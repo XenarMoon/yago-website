@@ -1036,7 +1036,7 @@ export default function ComingSoon() {
               </div>
 
               <motion.a
-                href="https://figural-dara-impedingly.ngrok-free.dev/chat"
+                href="https://figural-dara-impedingly.ngrok-free.dev/demo/access"
                 target="_blank"
                 rel="noopener noreferrer"
                 whileHover={{ scale: 1.05, boxShadow: "0 0 40px rgba(255,107,90,0.6)" }}
