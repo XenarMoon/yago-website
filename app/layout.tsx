@@ -21,6 +21,10 @@ export const metadata: Metadata = {
   description: 'Experience the epitome of luxury and sophistication. An exclusive journey awaits. Premium concierge service powered by AI and human expertise.',
   keywords: ['luxury', 'premium', 'AI concierge', 'personal assistant', 'lifestyle management', 'concierge service', 'virtual assistant', 'Yago'],
   authors: [{ name: 'Yago Team' }],
+  icons: {
+    icon: '/logo.png',
+    apple: '/logo.png',
+  },
   openGraph: {
     title: 'YAGO | Coming Soon',
     description: 'Experience the epitome of luxury and sophistication. An exclusive journey awaits.',
