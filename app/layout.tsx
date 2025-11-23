@@ -18,7 +18,7 @@ const playfair = Playfair_Display({
 
 export const metadata: Metadata = {
   title: 'YAGO | Coming Soon',
-  description: 'Experience the epitome of luxury and sophistication. An exclusive journey awaits. Premium concierge service powered by AI and human expertise.',
+  description: '✨ Premium AI Concierge • 24/7 Lifestyle Management • Luxury Travel • VIP Reservations • Personal Assistant',
   keywords: ['luxury', 'premium', 'AI concierge', 'personal assistant', 'lifestyle management', 'concierge service', 'virtual assistant', 'Yago'],
   authors: [{ name: 'Yago Team' }],
   icons: {
@@ -29,14 +29,14 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: 'YAGO | Coming Soon',
-    description: 'Experience the epitome of luxury and sophistication. An exclusive journey awaits.',
+    description: '✨ Premium AI Concierge • 24/7 Lifestyle Management • Luxury Travel • VIP Reservations • Personal Assistant',
     images: ['/og-image.jpg'],
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'YAGO | Coming Soon',
-    description: 'Experience the epitome of luxury and sophistication. An exclusive journey awaits.',
+    description: '✨ Premium AI Concierge • 24/7 Lifestyle Management • Luxury Travel • VIP Reservations • Personal Assistant',
     images: ['/og-image.jpg'],
   },
 };
