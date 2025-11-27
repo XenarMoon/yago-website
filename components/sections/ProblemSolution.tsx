@@ -30,27 +30,27 @@ const translations = {
       },
       {
         icon: Clock,
-        title: "Time Wasted on Coordination",
+        title: "Wasted Time",
         description: "Organizing a birthday party or business dinner means calling 10+ vendors separately — caterers, venues, decorators, transport."
       },
       {
         icon: Ban,
-        title: "No Reliable Concierge Service",
+        title: "No Concierge Service",
         description: "Premium concierge services like those in Dubai or London simply don't exist in Uzbekistan. High-net-worth individuals have no local solution."
       },
       {
         icon: MapPin,
-        title: "Fragmented Service Discovery",
+        title: "Hard to Find Services",
         description: "Finding trusted service providers is a nightmare. No centralized platform to compare, book, and pay for lifestyle services."
       },
       {
         icon: DollarSign,
-        title: "Hidden Costs & Surprises",
+        title: "Hidden Costs",
         description: "No transparent pricing. Services often charge differently based on who's calling. No accountability or quality guarantees."
       },
       {
         icon: AlertTriangle,
-        title: "Language & Communication Barriers",
+        title: "Language Barriers",
         description: "Expats and tourists struggle to communicate their needs. Local services rarely speak English or understand international standards."
       }
     ],
@@ -128,32 +128,32 @@ const translations = {
     problems: [
       {
         icon: Phone,
-        title: "Cheksiz Telefon Qo'ng'iroqlari",
+        title: "Cheksiz Qo'ng'iroqlar",
         description: "Oddiy bron qilish uchun restoran, klinika va xizmatlarga 30+ daqiqa qo'ng'iroq qilish. Ko'pchilik javob bermaydi yoki ma'lumotlar eskirgan."
       },
       {
         icon: Clock,
-        title: "Koordinatsiyaga Sarflangan Vaqt",
+        title: "Vaqt Isrofi",
         description: "Tug'ilgan kun yoki biznes kechki ovqatni tashkil qilish 10+ ta vendorga alohida qo'ng'iroq qilishni talab qiladi — katering, joy, dekor, transport."
       },
       {
         icon: Ban,
-        title: "Ishonchli Konsyerj Xizmati Yo'q",
+        title: "Konsyerj Yo'q",
         description: "Dubay yoki Londondagi kabi premium konsyerj xizmatlari O'zbekistonda mavjud emas. Yuqori daromadli shaxslar uchun mahalliy yechim yo'q."
       },
       {
         icon: MapPin,
-        title: "Tarqoq Xizmat Qidirish",
+        title: "Xizmat Topish Qiyin",
         description: "Ishonchli xizmat ko'rsatuvchilarni topish dahshat. Turmush xizmatlarini solishtirish, bron qilish va to'lash uchun markazlashgan platforma yo'q."
       },
       {
         icon: DollarSign,
-        title: "Yashirin Xarajatlar",
+        title: "Yashirin Narxlar",
         description: "Shaffof narxlar yo'q. Xizmatlar ko'pincha kim qo'ng'iroq qilayotganiga qarab turlicha narx oladi. Javobgarlik yoki sifat kafolati yo'q."
       },
       {
         icon: AlertTriangle,
-        title: "Til va Muloqot To'siqlari",
+        title: "Til To'siqlari",
         description: "Chet elliklar va sayyohlar ehtiyojlarini tushuntirishda qiynaladi. Mahalliy xizmatlar kamdan-kam ingliz tilida gaplashadi."
       }
     ],
@@ -284,11 +284,11 @@ export default function ProblemSolution({ language = 'en' }: ProblemSolutionProp
                   className="group relative"
                 >
                   <div className="absolute inset-0 bg-gradient-to-br from-red-500/10 to-transparent rounded-xl md:rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  <div className="relative p-3 sm:p-5 md:p-6 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl md:rounded-2xl hover:border-red-500/30 active:border-red-500/30 transition-all duration-300 h-full">
+                  <div className="relative p-3 sm:p-5 md:p-6 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl md:rounded-2xl hover:border-red-500/30 active:border-red-500/30 transition-all duration-300 h-full flex flex-col items-center text-center sm:items-start sm:text-left">
                     <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-red-500/10 rounded-lg md:rounded-xl flex items-center justify-center mb-2 sm:mb-3 md:mb-4">
                       <Icon className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-red-400" />
                     </div>
-                    <h4 className="text-xs sm:text-base md:text-xl font-bold mb-1 sm:mb-2 text-white leading-tight">{problem.title}</h4>
+                    <h4 className="text-[10px] sm:text-base md:text-xl font-bold mb-1 sm:mb-2 text-white leading-tight">{problem.title}</h4>
                     <p className="text-gray-400 text-[10px] sm:text-xs md:text-sm leading-relaxed hidden sm:block">{problem.description}</p>
                   </div>
                 </motion.div>
@@ -342,16 +342,14 @@ export default function ProblemSolution({ language = 'en' }: ProblemSolutionProp
                   className="group relative"
                 >
                   <div className="absolute inset-0 bg-gradient-to-br from-[#FF6B5A]/10 to-transparent rounded-xl md:rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  <div className="relative p-3 sm:p-5 md:p-6 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl md:rounded-2xl hover:border-[#FF6B5A]/30 active:border-[#FF6B5A]/30 transition-all duration-300 h-full">
-                    <div className="flex flex-col sm:flex-row items-start justify-between mb-2 sm:mb-3 md:mb-4 gap-2">
-                      <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-[#FF6B5A]/10 rounded-lg md:rounded-xl flex items-center justify-center">
-                        <Icon className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-[#FF6B5A]" />
-                      </div>
-                      <span className="px-1.5 sm:px-2 md:px-3 py-0.5 sm:py-1 bg-[#FF6B5A]/20 text-[#FF6B5A] text-[8px] sm:text-[10px] md:text-xs font-bold rounded-full">
-                        {solution.highlight}
-                      </span>
+                  <div className="relative p-3 sm:p-5 md:p-6 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl md:rounded-2xl hover:border-[#FF6B5A]/30 active:border-[#FF6B5A]/30 transition-all duration-300 h-full flex flex-col items-center text-center sm:items-start sm:text-left">
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-[#FF6B5A]/10 rounded-lg md:rounded-xl flex items-center justify-center mb-2 sm:mb-3 md:mb-4">
+                      <Icon className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-[#FF6B5A]" />
                     </div>
-                    <h4 className="text-xs sm:text-base md:text-xl font-bold mb-1 sm:mb-2 text-white leading-tight">{solution.title}</h4>
+                    <span className="px-1.5 sm:px-2 md:px-3 py-0.5 sm:py-1 bg-[#FF6B5A]/20 text-[#FF6B5A] text-[8px] sm:text-[10px] md:text-xs font-bold rounded-full mb-2 hidden sm:inline-block">
+                      {solution.highlight}
+                    </span>
+                    <h4 className="text-[10px] sm:text-base md:text-xl font-bold mb-1 sm:mb-2 text-white leading-tight">{solution.title}</h4>
                     <p className="text-gray-400 text-[10px] sm:text-xs md:text-sm leading-relaxed hidden sm:block">{solution.description}</p>
                   </div>
                 </motion.div>

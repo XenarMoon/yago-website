@@ -156,7 +156,7 @@ const founder = {
     en: ["AI Innovation", "Customer Experience", "Market Expansion", "Partnership Development"],
     uz: ["AI Innovatsiya", "Mijoz Tajribasi", "Bozorni Kengaytirish", "Hamkorlik Rivojlantirish"]
   },
-  avatar: "JB",
+  image: "/team/CEO.png",
   linkedin: "https://linkedin.com/in/javohirbekburiboev",
   color: "from-[#FF6B5A] via-orange-500 to-amber-500"
 };
@@ -328,8 +328,13 @@ export default function TeamPage() {
                       transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
                       className={`absolute -inset-2 bg-gradient-to-r ${founder.color} rounded-2xl md:rounded-3xl opacity-50 blur-md`}
                     />
-                    <div className={`relative w-24 h-24 md:w-32 md:h-32 lg:w-40 lg:h-40 bg-gradient-to-br ${founder.color} rounded-2xl md:rounded-3xl flex items-center justify-center`}>
-                      <span className="text-3xl md:text-4xl lg:text-5xl font-black text-white">{founder.avatar}</span>
+                    <div className={`relative w-24 h-24 md:w-32 md:h-32 lg:w-40 lg:h-40 bg-gradient-to-br ${founder.color} rounded-2xl md:rounded-3xl flex items-center justify-center overflow-hidden`}>
+                      <Image
+                        src={founder.image}
+                        alt={founder.name}
+                        fill
+                        className="object-cover"
+                      />
                     </div>
                     <div className="absolute -bottom-2 -right-2 md:-bottom-3 md:-right-3 w-9 h-9 md:w-12 md:h-12 bg-gradient-to-r from-[#FF6B5A] to-orange-500 rounded-lg md:rounded-xl border-4 border-black flex items-center justify-center">
                       <Crown className="w-4 h-4 md:w-6 md:h-6 text-white" />
@@ -424,9 +429,14 @@ export default function TeamPage() {
                         ]
                       }}
                       transition={{ duration: 3, repeat: Infinity }}
-                      className={`w-24 h-24 md:w-32 md:h-32 lg:w-40 lg:h-40 bg-gradient-to-br ${partner.color} rounded-2xl md:rounded-3xl flex items-center justify-center`}
+                      className={`relative w-24 h-24 md:w-32 md:h-32 lg:w-40 lg:h-40 bg-gradient-to-br ${partner.color} rounded-2xl md:rounded-3xl flex items-center justify-center overflow-hidden p-3 md:p-4`}
                     >
-                      <span className="text-2xl md:text-3xl lg:text-4xl font-black text-white">NATEX</span>
+                      <Image
+                        src="/team/natex-labs-logo.png"
+                        alt="Natex Labs"
+                        fill
+                        className="object-contain p-3 md:p-4"
+                      />
                     </motion.div>
                     <div className="absolute -bottom-2 -right-2 md:-bottom-3 md:-right-3 w-9 h-9 md:w-12 md:h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg md:rounded-xl border-4 border-black flex items-center justify-center">
                       <Rocket className="w-4 h-4 md:w-6 md:h-6 text-white" />
@@ -496,7 +506,7 @@ export default function TeamPage() {
               <p className="text-base md:text-xl text-gray-400">{t.whyTeamSubtitle}</p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+            <div className="grid grid-cols-3 gap-2 sm:gap-4 md:gap-6">
               {t.whyTeamItems.map((item, index) => {
                 const Icon = item.icon;
                 return (
@@ -506,13 +516,13 @@ export default function TeamPage() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.5, delay: index * 0.1 }}
-                    className="p-5 md:p-8 bg-white/5 border border-white/10 rounded-xl md:rounded-2xl hover:border-[#FF6B5A]/30 active:border-[#FF6B5A]/30 transition-all duration-300"
+                    className="p-3 sm:p-5 md:p-8 bg-white/5 border border-white/10 rounded-xl md:rounded-2xl hover:border-[#FF6B5A]/30 active:border-[#FF6B5A]/30 transition-all duration-300 flex flex-col items-center text-center sm:items-start sm:text-left"
                   >
-                    <div className="w-10 h-10 md:w-14 md:h-14 bg-[#FF6B5A]/10 rounded-lg md:rounded-xl flex items-center justify-center mb-4 md:mb-6">
-                      <Icon className="w-5 h-5 md:w-7 md:h-7 text-[#FF6B5A]" />
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-14 md:h-14 bg-[#FF6B5A]/10 rounded-lg md:rounded-xl flex items-center justify-center mb-2 sm:mb-4 md:mb-6">
+                      <Icon className="w-4 h-4 sm:w-5 sm:h-5 md:w-7 md:h-7 text-[#FF6B5A]" />
                     </div>
-                    <h3 className="text-lg md:text-xl font-bold text-white mb-2 md:mb-3">{item.title}</h3>
-                    <p className="text-gray-400 leading-relaxed text-sm md:text-base">{item.description}</p>
+                    <h3 className="text-[10px] sm:text-base md:text-xl font-bold text-white mb-1 sm:mb-2 md:mb-3 leading-tight">{item.title}</h3>
+                    <p className="text-gray-400 leading-relaxed text-[10px] sm:text-xs md:text-base hidden sm:block">{item.description}</p>
                   </motion.div>
                 );
               })}

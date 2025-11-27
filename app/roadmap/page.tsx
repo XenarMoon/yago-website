@@ -18,7 +18,7 @@ const translations = {
     title: "ROADMAP",
     subtitle: "YAGO project development stages and plans",
     currentStage: "Current Stage",
-    currentStageName: "MVP / Private Alpha",
+    currentStageName: "Private Alpha",
     focusTitle: "CURRENT",
     focusHighlight: "FOCUS",
     focusSubtitle: "Currently working on",
@@ -43,51 +43,51 @@ const translations = {
       {
         title: "Idea",
         titleLocal: "Idea",
-        description: "Problem identification and solution concept development",
+        description: "Idea developed with expertise and market research",
         features: [
           "Market research",
           "Problem validation",
           "Solution concept",
-          "Initial business model"
+          "Expert consultations"
         ],
-        timeline: "2024 Q3"
+        timeline: "2025 SEP"
       },
       {
         title: "Prototype",
         titleLocal: "Prototype",
-        description: "MVP prototype to test core functionality",
+        description: "Initial prototype to test core functionality",
         features: [
           "AI agent prototype",
           "Telegram bot integration",
           "Basic conversation flow",
           "Initial UI/UX"
         ],
-        timeline: "2024 Q4"
+        timeline: "2025 OCT"
       },
       {
         title: "MVP",
         titleLocal: "MVP",
-        description: "Minimum viable product - with core features",
+        description: "Full team power MVP development",
         features: [
           "Full AI chat system",
           "Agent dashboard",
           "Real-time WebSocket",
           "Booking API"
         ],
-        timeline: "2025 Q1"
+        timeline: "2025 NOV"
       },
       {
         title: "Private Alpha",
         titleLocal: "Private Alpha",
-        description: "Testing with limited users",
+        description: "Testing with limited users & mobile app development",
         features: [
-          "Alpha users",
-          "Feedback collection",
-          "Bug fixes",
-          "Feature improvements",
-          "AI500 competition"
+          "Alpha user testing",
+          "iOS app development",
+          "Android app development",
+          "AI500 competition",
+          "Bug fixes & improvements"
         ],
-        timeline: "2025 Q1-Q2"
+        timeline: "2026 JAN"
       },
       {
         title: "Public Beta",
@@ -95,11 +95,11 @@ const translations = {
         description: "Open beta version for wide audience",
         features: [
           "Public registration",
+          "iOS & Android apps",
           "Extended services",
-          "Premium subscription",
-          "Mobile apps"
+          "Premium subscription"
         ],
-        timeline: "2025 Q2-Q3"
+        timeline: "2026 JAN-FEB"
       },
       {
         title: "Commercial Launch",
@@ -111,7 +111,7 @@ const translations = {
           "API partner program",
           "International expansion"
         ],
-        timeline: "2025 Q4"
+        timeline: "2026 MAR"
       }
     ],
     milestones: [
@@ -129,7 +129,7 @@ const translations = {
     title: "ROADMAP",
     subtitle: "YAGO loyihasining rivojlanish bosqichlari va rejalari",
     currentStage: "Hozirgi bosqich",
-    currentStageName: "MVP / Private Alpha",
+    currentStageName: "Private Alpha",
     focusTitle: "HOZIRGI",
     focusHighlight: "FOKUS",
     focusSubtitle: "Ayni paytda ustida ishlamoqdamiz",
@@ -154,51 +154,51 @@ const translations = {
       {
         title: "Idea",
         titleLocal: "G'oya",
-        description: "Muammoni aniqlash va yechim kontseptsiyasini ishlab chiqish",
+        description: "G'oya ekspertlar bilan ishlab chiqildi va bozor tadqiqoti o'tkazildi",
         features: [
           "Bozor tadqiqoti",
           "Muammo validatsiyasi",
           "Yechim kontseptsiyasi",
-          "Dastlabki biznes model"
+          "Ekspert maslahatlari"
         ],
-        timeline: "2024 Q3"
+        timeline: "2025 SEN"
       },
       {
         title: "Prototype",
         titleLocal: "Prototip",
-        description: "Asosiy funksionallikni sinovdan o'tkazish uchun MVP prototip",
+        description: "Asosiy funksionallikni sinovdan o'tkazish uchun dastlabki prototip",
         features: [
           "AI agent prototip",
           "Telegram bot integratsiyasi",
           "Asosiy suhbat oqimi",
           "Dastlabki UI/UX"
         ],
-        timeline: "2024 Q4"
+        timeline: "2025 OKT"
       },
       {
         title: "MVP",
         titleLocal: "MVP",
-        description: "Minimal hayotiy mahsulot - asosiy funksiyalar bilan",
+        description: "To'liq jamoa kuchi bilan MVP ishlab chiqish",
         features: [
           "To'liq AI suhbat tizimi",
           "Agent dashboard",
           "Real-time WebSocket",
           "Bron qilish API"
         ],
-        timeline: "2025 Q1"
+        timeline: "2025 NOY"
       },
       {
         title: "Private Alpha",
         titleLocal: "Private Alpha",
-        description: "Cheklangan foydalanuvchilar bilan sinovdan o'tkazish",
+        description: "Cheklangan foydalanuvchilar bilan sinov va mobil ilova ishlab chiqish",
         features: [
-          "Alpha foydalanuvchilar",
-          "Feedback yig'ish",
-          "Xatoliklarni tuzatish",
-          "Funksiyalarni yaxshilash",
-          "AI500 tanlov"
+          "Alpha foydalanuvchi sinovlari",
+          "iOS ilova ishlab chiqish",
+          "Android ilova ishlab chiqish",
+          "AI500 tanlov",
+          "Xatolarni tuzatish"
         ],
-        timeline: "2025 Q1-Q2"
+        timeline: "2026 YAN"
       },
       {
         title: "Public Beta",
@@ -206,11 +206,11 @@ const translations = {
         description: "Keng auditoriya uchun ochiq beta versiya",
         features: [
           "Ommaviy ro'yxatdan o'tish",
+          "iOS va Android ilovalar",
           "Kengaytirilgan xizmatlar",
-          "Premium obuna",
-          "Mobil ilovalar"
+          "Premium obuna"
         ],
-        timeline: "2025 Q2-Q3"
+        timeline: "2026 YAN-FEV"
       },
       {
         title: "Commercial Launch",
@@ -222,7 +222,7 @@ const translations = {
           "API hamkorlik dasturi",
           "Xalqaro kengayish"
         ],
-        timeline: "2025 Q4"
+        timeline: "2026 MAR"
       }
     ],
     milestones: [
@@ -429,10 +429,7 @@ export default function RoadmapPage() {
           </motion.div>
 
           {/* Timeline - Mobile Version */}
-          <div className="relative mb-16 md:mb-32 md:hidden">
-            {/* Timeline Line */}
-            <div className="absolute left-6 top-0 bottom-0 w-px bg-gradient-to-b from-green-500 via-[#FF6B5A] to-gray-800" />
-
+          <div className="relative mb-16 md:mb-32 md:hidden px-2">
             {/* Timeline Items */}
             {t.phases.map((phase, index) => {
               const Icon = phaseIcons[index];
@@ -440,69 +437,81 @@ export default function RoadmapPage() {
               return (
                 <motion.div
                   key={index}
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
-                  className="relative flex items-start mb-6"
+                  className="relative mb-4"
                 >
-                  {/* Timeline Node */}
-                  <div className="absolute left-6 transform -translate-x-1/2 z-10">
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center border-2 ${
-                      status === 'completed'
-                        ? 'bg-green-500/20 border-green-500'
-                        : status === 'current'
-                          ? 'bg-[#FF6B5A]/20 border-[#FF6B5A]'
-                          : 'bg-gray-800/50 border-gray-700'
-                    }`}>
-                      <Icon className={`w-5 h-5 ${
+                  <div className={`p-4 rounded-xl border ${getStatusColor(status)} backdrop-blur-sm`}>
+                    {/* Header with Icon */}
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center border-2 flex-shrink-0 ${
                         status === 'completed'
-                          ? 'text-green-400'
+                          ? 'bg-green-500/20 border-green-500'
                           : status === 'current'
-                            ? 'text-[#FF6B5A]'
-                            : 'text-gray-500'
+                            ? 'bg-[#FF6B5A]/20 border-[#FF6B5A]'
+                            : 'bg-gray-800/50 border-gray-700'
+                      }`}>
+                        <Icon className={`w-5 h-5 ${
+                          status === 'completed'
+                            ? 'text-green-400'
+                            : status === 'current'
+                              ? 'text-[#FF6B5A]'
+                              : 'text-gray-500'
+                        }`} />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="text-base font-bold text-white">{phase.title}</h3>
+                        <p className="text-[10px] text-gray-500">{phase.timeline}</p>
+                      </div>
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${
+                        status === 'completed'
+                          ? 'bg-green-500/20 text-green-400'
+                          : status === 'current'
+                            ? 'bg-[#FF6B5A]/20 text-[#FF6B5A]'
+                            : 'bg-gray-700/50 text-gray-400'
+                      }`}>
+                        {getStatusLabel(status)}
+                      </span>
+                    </div>
+
+                    {/* Description */}
+                    <p className="text-gray-400 text-xs mb-3">{phase.description}</p>
+
+                    {/* Features */}
+                    <div className="flex flex-wrap gap-1.5">
+                      {phase.features.slice(0, 3).map((feature, i) => (
+                        <span key={i} className={`px-2 py-1 rounded-lg text-[10px] ${
+                          status === 'completed'
+                            ? 'bg-green-500/10 text-green-400'
+                            : status === 'current'
+                              ? 'bg-[#FF6B5A]/10 text-[#FF6B5A]'
+                              : 'bg-gray-800/50 text-gray-500'
+                        }`}>
+                          {feature}
+                        </span>
+                      ))}
+                      {phase.features.length > 3 && (
+                        <span className="px-2 py-1 rounded-lg text-[10px] bg-gray-800/30 text-gray-500">
+                          +{phase.features.length - 3}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Connector Line */}
+                  {index < t.phases.length - 1 && (
+                    <div className="flex justify-center py-2">
+                      <div className={`w-0.5 h-4 ${
+                        status === 'completed'
+                          ? 'bg-green-500/50'
+                          : status === 'current'
+                            ? 'bg-[#FF6B5A]/50'
+                            : 'bg-gray-700/50'
                       }`} />
                     </div>
-                  </div>
-
-                  {/* Content Card */}
-                  <div className="ml-14 flex-1">
-                    <div className={`p-4 rounded-xl border ${getStatusColor(status)} backdrop-blur-sm`}>
-                      {/* Status Badge */}
-                      <div className="flex items-center justify-between mb-3">
-                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${
-                          status === 'completed'
-                            ? 'bg-green-500/20 text-green-400'
-                            : status === 'current'
-                              ? 'bg-[#FF6B5A]/20 text-[#FF6B5A]'
-                              : 'bg-gray-700/50 text-gray-400'
-                        }`}>
-                          {getStatusLabel(status)}
-                        </span>
-                        <span className="text-[10px] text-gray-500">{phase.timeline}</span>
-                      </div>
-
-                      {/* Title */}
-                      <h3 className="text-lg font-bold text-white mb-0.5">{phase.title}</h3>
-                      <p className="text-[#FF6B5A] text-xs mb-2">{phase.titleLocal}</p>
-                      <p className="text-gray-400 text-xs mb-3">{phase.description}</p>
-
-                      {/* Features */}
-                      <div className="space-y-1.5">
-                        {phase.features.slice(0, 3).map((feature, i) => (
-                          <div key={i} className="flex items-center gap-2 text-xs">
-                            {getStatusIcon(status)}
-                            <span className={status === 'completed' ? 'text-gray-300' : 'text-gray-400'}>
-                              {feature}
-                            </span>
-                          </div>
-                        ))}
-                        {phase.features.length > 3 && (
-                          <p className="text-[10px] text-gray-500 pl-6">+{phase.features.length - 3} more</p>
-                        )}
-                      </div>
-                    </div>
-                  </div>
+                  )}
                 </motion.div>
               );
             })}

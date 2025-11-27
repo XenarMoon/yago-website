@@ -1085,7 +1085,7 @@ export default function ComingSoon() {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-8">
+            <div className="grid grid-cols-3 gap-2 sm:gap-4 md:gap-8">
               {t.benefits.items.map((benefit, i) => {
                 const Icon = benefitIcons[i];
                 return (
@@ -1093,10 +1093,10 @@ export default function ComingSoon() {
                     key={i}
                     className="group"
                   >
-                    <div className="p-5 md:p-8 border border-white/10 hover:border-[#FF6B5A] active:border-[#FF6B5A] transition-all duration-300 rounded-xl md:rounded-none">
-                      <Icon className="w-10 h-10 md:w-12 md:h-12 text-[#FF6B5A] mb-4 md:mb-6" />
-                      <h3 className="text-xl md:text-2xl font-bold mb-2 md:mb-3">{benefit.title}</h3>
-                      <p className="text-sm md:text-base text-gray-400 font-light">{benefit.description}</p>
+                    <div className="p-3 sm:p-5 md:p-8 border border-white/10 hover:border-[#FF6B5A] active:border-[#FF6B5A] transition-all duration-300 rounded-xl md:rounded-none flex flex-col items-center text-center sm:items-start sm:text-left">
+                      <Icon className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-[#FF6B5A] mb-2 sm:mb-4 md:mb-6" />
+                      <h3 className="text-[10px] sm:text-base md:text-2xl font-bold mb-1 sm:mb-2 md:mb-3 leading-tight">{benefit.title}</h3>
+                      <p className="text-[10px] sm:text-xs md:text-base text-gray-400 font-light hidden sm:block">{benefit.description}</p>
                     </div>
                   </div>
                 );
