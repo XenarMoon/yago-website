@@ -6,17 +6,28 @@ import {
   ArrowRight, ArrowUpRight, Check, Star, Award, Brain,
   Clock, Shield, Zap, Globe, MessageCircle, Calendar, HeadphonesIcon,
   Plane, Utensils, ShoppingBag, Home, Car, Gift, Briefcase, Heart,
-  Music, ShieldAlert, GraduationCap, Stethoscope, Languages, Rocket, Sparkles
+  Music, ShieldAlert, GraduationCap, Stethoscope, Languages, Rocket, Sparkles,
+  Users, Map, Menu, X
 } from 'lucide-react';
+import Link from 'next/link';
 import SuccessModal from '@/components/SuccessModal';
 import { BenefitCard } from '@/components/BenefitCard';
 import { FeatureCard } from '@/components/FeatureCard';
 import { FAQItem } from '@/components/FAQItem';
+import ProblemSolution from '@/components/sections/ProblemSolution';
+import TechApproach from '@/components/sections/TechApproach';
+import Partners from '@/components/sections/Partners';
 
-type Language = 'en' | 'ru';
+type Language = 'en' | 'uz';
 
 const translations = {
   en: {
+    nav: {
+      problem: "Problem & Solution",
+      tech: "Technology",
+      team: "Team",
+      roadmap: "Roadmap"
+    },
     badge: {
       text: "The World's First AI Concierge",
       chip: "ANY TASK"
@@ -32,26 +43,30 @@ const translations = {
       waitlist: "Join the waitlist • Be first to experience premium AI concierge"
     },
     marquee: "24/7 AVAILABLE • AI POWERED • PREMIUM SERVICE",
-    problem: {
-      title: "THE PROBLEM",
+    whatIsYago: {
+      title: "WHAT IS",
+      titleHighlight: "YAGO?",
+      subtitle: "Your personal AI assistant that handles life's tasks so you don't have to",
       items: [
-        "Hours wasted on phone calls",
-        "Missing exclusive experiences",
-        "Juggling multiple apps",
-        "No time for important moments",
-        "Expensive traditional services",
-        "Limited availability"
+        "One message to get anything done",
+        "Works 24/7, never sleeps, never forgets",
+        "Speaks your language — Uzbek, Russian, English",
+        "Remembers your preferences forever",
+        "Trusted by professionals & families",
+        "Dubai-level service at local prices"
       ]
     },
-    solution: {
-      title: "THE SOLUTION",
+    yagoCanDo: {
+      title: "YAGO",
+      titleHighlight: "CAN DO",
+      subtitle: "Tell YAGO what you need. Watch it happen.",
       items: [
-        "Instant 24/7 availability",
-        "Exclusive venue access",
-        "One AI for everything",
-        "Time for what matters",
-        "Affordable token pricing",
-        "AI-powered efficiency"
+        "Order groceries & deliver to your door",
+        "Find trusted plumbers & electricians",
+        "Book the best table at top restaurants",
+        "Schedule doctor appointments instantly",
+        "Plan your entire birthday party or event",
+        "Call services for you & negotiate prices"
       ]
     },
     howItWorks: {
@@ -143,131 +158,141 @@ const translations = {
       contact: "Contact us on LinkedIn"
     }
   },
-  ru: {
+  uz: {
+    nav: {
+      problem: "Muammo va Yechim",
+      tech: "Texnologiya",
+      team: "Jamoa",
+      roadmap: "Roadmap"
+    },
     badge: {
-      text: "Первый в мире ИИ-консьерж",
-      chip: "ЛЮБАЯ ЗАДАЧА"
+      text: "Dunyodagi birinchi AI konsyerj",
+      chip: "HAR QANDAY VAZIFA"
     },
     hero: {
-      line1: "ИСКУССТВЕННЫЙ",
-      line2: "ИНТЕЛЛЕКТ",
-      line3: "АССИСТЕНТ",
-      tagline: "Сервис мирового уровня — как в Дубае и Лондоне",
-      subtitle: "Консьерж с ИИ 24/7 у вас под рукой",
-      emailPlaceholder: "Введите ваш email",
-      joinButton: "ПРИСОЕДИНИТЬСЯ",
-      waitlist: "Присоединяйтесь к списку ожидания • Будьте первыми"
+      line1: "AI",
+      line2: "HAYOT TARZI",
+      line3: "YORDAMCHISI",
+      tagline: "Dubay va London standartlaridagi xizmat",
+      subtitle: "24/7 AI konsyerj qo'lingizda",
+      emailPlaceholder: "Emailingizni kiriting",
+      joinButton: "QO'SHILING",
+      waitlist: "Kutish ro'yxatiga qo'shiling • Birinchilardan bo'ling"
     },
-    marquee: "ДОСТУПНО 24/7 • РАБОТАЕТ НА ИИ • ПРЕМИУМ СЕРВИС",
-    problem: {
-      title: "ПРОБЛЕМА",
+    marquee: "24/7 MAVJUD • AI QUVVATIDA • PREMIUM XIZMAT",
+    whatIsYago: {
+      title: "YAGO",
+      titleHighlight: "NIMA?",
+      subtitle: "Hayotdagi vazifalarni siz uchun bajaradigan shaxsiy AI yordamchi",
       items: [
-        "Часы потрачены на звонки",
-        "Упущенные возможности",
-        "Множество приложений",
-        "Нет времени на важное",
-        "Дорогие традиционные услуги",
-        "Ограниченная доступность"
+        "Bitta xabar bilan hamma narsani bajaring",
+        "24/7 ishlaydi, hech qachon uxlamaydi",
+        "Tilingizni tushunadi — O'zbek, Rus, Ingliz",
+        "Afzalliklaringizni abadiy eslab qoladi",
+        "Mutaxassislar va oilalar ishonadi",
+        "Dubay darajasidagi xizmat, mahalliy narxda"
       ]
     },
-    solution: {
-      title: "РЕШЕНИЕ",
+    yagoCanDo: {
+      title: "YAGO",
+      titleHighlight: "QILA OLADI",
+      subtitle: "YAGO ga nima kerakligini ayting. Natijani kuzating.",
       items: [
-        "Мгновенная доступность 24/7",
-        "Доступ к эксклюзивным местам",
-        "Один ИИ для всего",
-        "Время для важного",
-        "Доступные токены",
-        "Эффективность ИИ"
+        "Oziq-ovqat buyurtma qiling va eshikka yetkazib bering",
+        "Ishonchli santexnik va elektriklarni toping",
+        "Eng yaxshi restoranlarda stol band qiling",
+        "Shifokor qabuliga bir zumda yoziling",
+        "Tug'ilgan kun yoki tadbiringizni to'liq rejalashtiring",
+        "Xizmatlarni chaqiring va narxlarni kelishing"
       ]
     },
     howItWorks: {
-      title: "КАК ЭТО РАБОТАЕТ",
+      title: "QANDAY ISHLAYDI",
       steps: [
-        { title: "СПРОСИТЕ", desc: "Отправьте запрос YAGO на естественном языке" },
-        { title: "ИИ ОБРАБАТЫВАЕТ", desc: "Продвинутый ИИ мгновенно координирует все детали" },
-        { title: "ГОТОВО", desc: "Получайте подтверждения и наслаждайтесь" }
+        { title: "SO'RANG", desc: "YAGO ga so'rovingizni tabiiy tilda yuboring" },
+        { title: "AI QAYTA ISHLAYDI", desc: "Ilg'or AI barcha tafsilotlarni bir zumda muvofiqlashtiradi" },
+        { title: "TAYYOR", desc: "Tasdiqlashlarni oling va vaqtingizdan zavqlaning" }
       ]
     },
     benefits: {
-      title: "ПРЕМИУМ ПРЕИМУЩЕСТВА",
-      subtitle: "Испытайте консьерж-сервис, который превосходит ожидания",
+      title: "PREMIUM AFZALLIKLAR",
+      subtitle: "Kutilganlardan oshib ketadigan konsyerj xizmatini his qiling",
       items: [
-        { title: "Доступность 24/7", description: "Ваш помощник никогда не спит" },
-        { title: "Мгновенные ответы", description: "Молниеносная обработка ИИ" },
-        { title: "Корпоративная безопасность", description: "Шифрование банковского уровня" },
-        { title: "Глобальный охват", description: "Поддержка 150+ стран" },
-        { title: "Естественные диалоги", description: "Не нужно учить команды" },
-        { title: "Белые перчатки", description: "Премиальный сервис" }
+        { title: "24/7 Mavjudlik", description: "Shaxsiy yordamchingiz hech qachon uxlamaydi" },
+        { title: "Bir zumda javoblar", description: "Tezkor AI qayta ishlash" },
+        { title: "Korxona xavfsizligi", description: "Bank darajasidagi shifrlash" },
+        { title: "Global qamrov", description: "150+ davlatni qo'llab-quvvatlash" },
+        { title: "Tabiiy suhbatlar", description: "O'rganish kerak bo'lmagan buyruqlar" },
+        { title: "Yuqori sifat", description: "Premium konsyerj tajribasi" }
       ]
     },
     features: {
-      title: "ВСЁ ЧТО ВАМ НУЖНО",
+      title: "SIZGA KERAK HAMMA NARSA",
       items: [
-        { title: "Планирование путешествий", description: "Авиабилеты, отели, маршруты" },
-        { title: "Бронирование ресторанов", description: "Лучшие столики по всему миру" },
-        { title: "Персональный шопинг", description: "Найдем всё что нужно" },
-        { title: "Домашние услуги", description: "Обслуживание по запросу" },
-        { title: "Транспорт", description: "Такси, аренда, шофёр" },
-        { title: "Подарки", description: "Идеи для любого случая" },
-        { title: "Бизнес поддержка", description: "Исследования, планирование" },
-        { title: "Здоровье и wellness", description: "Спа, фитнес, записи" },
-        { title: "Развлечения", description: "Билеты, события, VIP" },
-        { title: "Безопасность", description: "Экстренная поддержка 24/7" },
-        { title: "Обучение", description: "Курсы и репетиторство" },
-        { title: "Медицинские записи", description: "Запись в клиники и больницы" }
+        { title: "Sayohat rejalashtirish", description: "Parvozlar, mehmonxonalar, marshrutlar" },
+        { title: "Restoran bron qilish", description: "Butun dunyo bo'ylab eng yaxshi stollar" },
+        { title: "Shaxsiy xaridlar", description: "Kerakli narsani toping" },
+        { title: "Uy xizmatlari", description: "Talab bo'yicha texnik xizmat" },
+        { title: "Transport", description: "Taksi, ijara, shofyor" },
+        { title: "Sovg'a tavsiyalari", description: "Har qanday holat uchun" },
+        { title: "Biznes qo'llab-quvvatlash", description: "Tadqiqot, rejalashtirish, ma'muriy" },
+        { title: "Salomatlik", description: "Spa, fitnes, uchrashuvlar" },
+        { title: "Ko'ngil ochar", description: "Chiptalar, tadbirlar, VIP" },
+        { title: "Xavfsizlik", description: "24/7 favqulodda yordam" },
+        { title: "Ta'lim", description: "Kurslar va repetitorlik" },
+        { title: "Tibbiy uchrashuvlar", description: "Klinika va kasalxonaga yozilish" }
       ]
     },
     premium: {
-      title1: "ПОЖИЗНЕННЫЙ",
-      title2: "БЕЗЛИМИТНЫЙ",
-      title3: "ДОСТУП",
-      subtitle: "Присоединяйтесь к эксклюзивному сообществу Premium членов с безлимитным доступом к YAGO, навсегда.",
-      button: "ЗАПРОСИТЬ ДЕМО",
+      title1: "UMRBOD",
+      title2: "CHEKSIZ",
+      title3: "KIRISH",
+      subtitle: "Cheksiz YAGO kirishiga ega Premium a'zolarning ekskluziv jamoasiga qo'shiling, abadiy.",
+      button: "DEMO SO'RASH",
       benefits: [
-        "Безлимитные запросы навсегда",
-        "VIP приоритетная поддержка",
-        "Эксклюзивные функции первыми",
-        "Значок премиум члена",
-        "Доступ к премиум партнёрам",
-        "Выделенный менеджер",
-        "Передаваемый NFT",
-        "Закрытые мероприятия"
+        "Abadiy cheksiz so'rovlar",
+        "VIP ustuvor qo'llab-quvvatlash",
+        "Birinchi bo'lib ekskluziv funksiyalar",
+        "Premium a'zo nishoni",
+        "Premium hamkorlarga kirish",
+        "Maxsus akkaunt menejeri",
+        "O'tkazuvchan NFT egaligi",
+        "Faqat a'zolar uchun tadbirlar"
       ]
     },
     faq: {
-      title: "ВОПРОСЫ",
+      title: "SAVOL-JAVOB",
       items: [
         {
-          question: "Что такое YAGO Concierge?",
-          answer: "YAGO — это ИИ-ассистент для образа жизни, доступный 24/7 в Telegram, iOS и Android. Он помогает со всем: от планирования путешествий до покупок и личных задач."
+          question: "YAGO Concierge nima?",
+          answer: "YAGO — Telegram, iOS va Android da 24/7 mavjud AI quvvatidagi hayot tarzi yordamchisi. Sayohat rejalashtirish va bronlashdan tortib xarid va shaxsiy vazifalargacha hamma narsada yordam beradi."
         },
         {
-          question: "Как работает система токенов?",
-          answer: "Каждый запрос стоит 1 токен. Вы можете купить пакеты токенов (10, 25, 50 или 100) в зависимости от потребностей. Токены не истекают."
+          question: "Token tizimi qanday ishlaydi?",
+          answer: "Har bir so'rov 1 token turadi. Ehtiyojlaringizga qarab token paketlarini (10, 25, 50 yoki 100) sotib olishingiz mumkin. Tokenlar hech qachon eskirmasdi."
         },
         {
-          question: "Что такое Premium NFT членство?",
-          answer: "Premium NFT — это пожизненное членство, дающее безлимитный доступ к YAGO без токенов за запрос. Включает приоритетную поддержку и эксклюзивные функции."
+          question: "Premium NFT a'zolik nima?",
+          answer: "Premium NFT — so'rov uchun token kerak bo'lmasdan YAGO ga cheksiz kirish imkonini beradigan umrbod a'zolik. Ustuvor qo'llab-quvvatlash va ekskluziv funksiyalarni ham o'z ichiga oladi."
         },
         {
-          question: "Безопасны ли мои данные?",
-          answer: "Абсолютно. Мы используем шифрование банковского уровня и корпоративные стандарты безопасности. Ваши разговоры полностью конфиденциальны."
+          question: "Ma'lumotlarim xavfsizmi?",
+          answer: "Albatta. Biz bank darajasidagi shifrlash va korxona xavfsizligi standartlaridan foydalanamiz. Sizning suhbatlaringiz va shaxsiy ma'lumotlaringiz butunlay maxfiy va hech qachon ulashilmaydi."
         },
         {
-          question: "Какие запросы может обработать YAGO?",
-          answer: "YAGO помогает с бронированием путешествий, резервациями ресторанов, покупками, подарками, домашними услугами, планированием мероприятий и многим другим."
+          question: "YAGO qanday so'rovlarni bajarishi mumkin?",
+          answer: "YAGO sayohat bronlari, restoran rezervlari, xaridlar, sovg'a tavsiyalari, uy xizmatlari, tadbir rejalashtirish, tadqiqot, rejalashtirish va boshqa ko'p narsalarda yordam berishi mumkin."
         },
         {
-          question: "Как быстро отвечает YAGO?",
-          answer: "YAGO обычно отвечает за секунды. Сложные запросы с подтверждениями бронирования могут занять пару минут."
+          question: "YAGO qanchalik tez javob beradi?",
+          answer: "YAGO odatda soniyalar ichida javob beradi. Bron tasdiqlashlarini talab qiladigan murakkab so'rovlar bir necha daqiqa olishi mumkin."
         }
       ]
     },
     footer: {
-      tagline: "Ваш ИИ-ассистент образа жизни 24/7",
-      copyright: "© 2025 YAGO Concierge • Работает на Natex Labs × AI",
-      contact: "Свяжитесь с нами в LinkedIn"
+      tagline: "Sizning 24/7 AI hayot tarzi yordamchingiz",
+      copyright: "© 2025 YAGO Concierge • Natex Labs × AI tomonidan quvvatlanadi",
+      contact: "LinkedIn orqali bog'laning"
     }
   }
 };
@@ -279,6 +304,7 @@ export default function ComingSoon() {
   const [errorMessage, setErrorMessage] = useState('');
   const [language, setLanguage] = useState<Language>('en');
   const [pageLoaded, setPageLoaded] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const t = translations[language];
 
@@ -438,7 +464,7 @@ export default function ComingSoon() {
   };
 
   const toggleLanguage = () => {
-    setLanguage(prev => prev === 'en' ? 'ru' : 'en');
+    setLanguage(prev => prev === 'en' ? 'uz' : 'en');
   };
 
   const benefitIcons = [Clock, Zap, Shield, Globe, MessageCircle, HeadphonesIcon];
@@ -561,7 +587,7 @@ export default function ComingSoon() {
             scale: badgeScale
           }}
           transition={{ duration: 1, delay: 0.3, type: "spring", stiffness: 100 }}
-          className="fixed top-4 md:top-6 left-4 lg:left-1/2 lg:-translate-x-1/2 z-40 max-w-[calc(100vw-2rem)] px-2"
+          className="fixed top-14 md:top-6 left-3 md:left-12 z-40"
         >
           <motion.div
             animate={{
@@ -584,14 +610,14 @@ export default function ComingSoon() {
             />
 
             {/* Main badge container with gradient border */}
-            <div className="relative px-4 md:px-8 py-3 md:py-4 rounded-full bg-gradient-to-r from-black/60 via-black/50 to-black/60 backdrop-blur-xl border-2 border-transparent"
+            <div className="relative px-2.5 md:px-8 py-2 md:py-4 rounded-full bg-gradient-to-r from-black/60 via-black/50 to-black/60 backdrop-blur-xl border-2 border-transparent"
                  style={{
                    backgroundImage: 'linear-gradient(black, black), linear-gradient(90deg, transparent, #FF6B5A, transparent)',
                    backgroundOrigin: 'border-box',
                    backgroundClip: 'padding-box, border-box'
                  }}>
 
-              {/* Sparkle particles */}
+              {/* Sparkle particles - hidden on mobile */}
               <motion.div
                 animate={{
                   opacity: [0, 1, 0],
@@ -600,7 +626,7 @@ export default function ComingSoon() {
                   y: -20
                 }}
                 transition={{ duration: 2, repeat: Infinity, repeatDelay: 1 }}
-                className="absolute -top-1 left-8"
+                className="hidden md:block absolute -top-1 left-8"
               >
                 <Sparkles className="w-3 h-3 text-[#FF6B5A]" />
               </motion.div>
@@ -613,18 +639,18 @@ export default function ComingSoon() {
                   y: -20
                 }}
                 transition={{ duration: 2, repeat: Infinity, repeatDelay: 1, delay: 0.5 }}
-                className="absolute -top-1 right-8"
+                className="hidden md:block absolute -top-1 right-8"
               >
                 <Sparkles className="w-3 h-3 text-[#FF6B5A]" />
               </motion.div>
 
-              {/* Circuit-style corner decorations */}
-              <div className="absolute top-2 left-3 w-2 h-2 border-t-2 border-l-2 border-[#FF6B5A]/40" />
-              <div className="absolute top-2 right-3 w-2 h-2 border-t-2 border-r-2 border-[#FF6B5A]/40" />
-              <div className="absolute bottom-2 left-3 w-2 h-2 border-b-2 border-l-2 border-[#FF6B5A]/40" />
-              <div className="absolute bottom-2 right-3 w-2 h-2 border-b-2 border-r-2 border-[#FF6B5A]/40" />
+              {/* Circuit-style corner decorations - hidden on mobile */}
+              <div className="hidden md:block absolute top-2 left-3 w-2 h-2 border-t-2 border-l-2 border-[#FF6B5A]/40" />
+              <div className="hidden md:block absolute top-2 right-3 w-2 h-2 border-t-2 border-r-2 border-[#FF6B5A]/40" />
+              <div className="hidden md:block absolute bottom-2 left-3 w-2 h-2 border-b-2 border-l-2 border-[#FF6B5A]/40" />
+              <div className="hidden md:block absolute bottom-2 right-3 w-2 h-2 border-b-2 border-r-2 border-[#FF6B5A]/40" />
 
-              <div className="flex items-center gap-1 md:gap-2 whitespace-nowrap">
+              <div className="flex items-center gap-1 md:gap-2">
                 {/* Animated rocket icon */}
                 <motion.div
                   animate={{
@@ -649,11 +675,11 @@ export default function ComingSoon() {
                 <motion.div
                   animate={{ scaleY: [1, 1.2, 1] }}
                   transition={{ duration: 2, repeat: Infinity }}
-                  className="w-px h-4 md:h-6 bg-gradient-to-b from-transparent via-[#FF6B5A]/50 to-transparent flex-shrink-0"
+                  className="w-px h-3 md:h-6 bg-gradient-to-b from-transparent via-[#FF6B5A]/50 to-transparent flex-shrink-0"
                 />
 
                 {/* Text with gradient */}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-gray-400 text-[8px] sm:text-[10px] md:text-sm font-semibold tracking-wide whitespace-nowrap">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-gray-400 text-[7px] sm:text-[9px] md:text-sm font-semibold tracking-wide">
                   {t.badge.text}
                 </span>
 
@@ -661,7 +687,7 @@ export default function ComingSoon() {
                 <motion.div
                   animate={{ scaleY: [1, 1.2, 1] }}
                   transition={{ duration: 2, repeat: Infinity, delay: 1 }}
-                  className="w-px h-4 md:h-6 bg-gradient-to-b from-transparent via-[#FF6B5A]/50 to-transparent flex-shrink-0"
+                  className="w-px h-3 md:h-6 bg-gradient-to-b from-transparent via-[#FF6B5A]/50 to-transparent flex-shrink-0"
                 />
 
                 {/* Premium badge chip */}
@@ -674,7 +700,7 @@ export default function ComingSoon() {
                     transition={{ duration: 2, repeat: Infinity }}
                     className="absolute inset-0 bg-white/20 rounded-full"
                   />
-                  <span className="relative z-10 text-black text-[8px] sm:text-[9px] md:text-xs font-black tracking-wider whitespace-nowrap">
+                  <span className="relative z-10 text-black text-[7px] sm:text-[9px] md:text-xs font-black tracking-wider">
                     {t.badge.chip}
                   </span>
                 </motion.div>
@@ -693,18 +719,88 @@ export default function ComingSoon() {
           </motion.div>
         </motion.div>
 
-        {/* Language Switcher - Top Right */}
-        <div className="fixed top-20 md:top-8 right-4 md:right-8 z-50">
+        {/* Navigation Bar - Fixed at top */}
+        <nav className="fixed top-3 md:top-6 right-3 md:right-8 z-50 flex items-center gap-1.5 md:gap-3">
+          {/* Desktop Navigation Links */}
+          <div className="hidden md:flex items-center gap-1 px-2 py-1 bg-white/5 border border-white/10 backdrop-blur-xl rounded-full">
+            <a href="#muammo-yechim" className="px-4 py-2 text-sm text-white/70 hover:text-[#FF6B5A] transition-colors">
+              {t.nav.problem}
+            </a>
+            <a href="#tech-approach" className="px-4 py-2 text-sm text-white/70 hover:text-[#FF6B5A] transition-colors">
+              {t.nav.tech}
+            </a>
+            <Link href="/team" className="px-4 py-2 text-sm text-white/70 hover:text-[#FF6B5A] transition-colors flex items-center gap-1">
+              <Users className="w-4 h-4" />
+              {t.nav.team}
+            </Link>
+            <Link href="/roadmap" className="px-4 py-2 text-sm text-white/70 hover:text-[#FF6B5A] transition-colors flex items-center gap-1">
+              <Map className="w-4 h-4" />
+              {t.nav.roadmap}
+            </Link>
+          </div>
+
+          {/* Language Switcher */}
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={toggleLanguage}
-            className="px-4 md:px-6 py-2 md:py-3 bg-white/5 border border-white/10 hover:border-[#FF6B5A] backdrop-blur-xl transition-all duration-300 flex items-center gap-2 group rounded-full"
+            className="px-2.5 md:px-6 py-1.5 md:py-3 bg-white/5 border border-white/10 hover:border-[#FF6B5A] backdrop-blur-xl transition-all duration-300 flex items-center gap-1 md:gap-2 group rounded-full"
           >
-            <Languages className="w-4 h-4 text-[#FF6B5A]" />
-            <span className="font-medium text-sm md:text-base">{language.toUpperCase()}</span>
+            <Languages className="w-3 h-3 md:w-4 md:h-4 text-[#FF6B5A]" />
+            <span className="font-medium text-xs md:text-base">{language.toUpperCase()}</span>
           </motion.button>
-        </div>
+
+          {/* Mobile Menu Button */}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="md:hidden p-2 bg-white/5 border border-white/10 backdrop-blur-xl rounded-full"
+          >
+            {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+          </button>
+        </nav>
+
+        {/* Mobile Menu Overlay */}
+        {mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="fixed top-12 right-3 z-50 md:hidden"
+          >
+            <div className="bg-black/90 border border-white/10 backdrop-blur-xl rounded-2xl p-4 min-w-[200px]">
+              <a
+                href="#muammo-yechim"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block px-4 py-3 text-white/70 hover:text-[#FF6B5A] transition-colors border-b border-white/10"
+              >
+                {t.nav.problem}
+              </a>
+              <a
+                href="#tech-approach"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block px-4 py-3 text-white/70 hover:text-[#FF6B5A] transition-colors border-b border-white/10"
+              >
+                {t.nav.tech}
+              </a>
+              <Link
+                href="/team"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2 px-4 py-3 text-white/70 hover:text-[#FF6B5A] transition-colors border-b border-white/10"
+              >
+                <Users className="w-4 h-4" />
+                {t.nav.team}
+              </Link>
+              <Link
+                href="/roadmap"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2 px-4 py-3 text-white/70 hover:text-[#FF6B5A] transition-colors"
+              >
+                <Map className="w-4 h-4" />
+                {t.nav.roadmap}
+              </Link>
+            </div>
+          </motion.div>
+        )}
 
         {/* Hero Section - Boulder Style */}
         <section className="relative min-h-screen flex items-center justify-center px-6 py-20 overflow-hidden">
@@ -845,50 +941,94 @@ export default function ComingSoon() {
           </div>
         </motion.section>
 
-        {/* Problem → Solution - Boulder Style */}
+        {/* What is YAGO + What YAGO Can Do - Creative Section */}
         <motion.section
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.2 }}
           transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
-          className="py-32 px-6"
+          className="py-16 md:py-32 px-4 md:px-6"
           style={{ willChange: 'opacity, transform' }}
         >
           <div className="max-w-7xl mx-auto">
-            <div className="mb-24">
-              <h2 className="text-6xl md:text-8xl font-black mb-8">
-                {t.problem.title.split(' ')[0]} <span className="text-[#FF6B5A]">{t.problem.title.split(' ').slice(1).join(' ')}</span>
-              </h2>
-              <div className="grid md:grid-cols-2 gap-12 text-xl text-gray-400 font-light">
-                <div className="space-y-4">
-                  {t.problem.items.slice(0, 3).map((item, i) => (
-                    <p key={i}>→ {item}</p>
-                  ))}
-                </div>
-                <div className="space-y-4">
-                  {t.problem.items.slice(3).map((item, i) => (
-                    <p key={i}>→ {item}</p>
-                  ))}
-                </div>
+            {/* What is YAGO Section */}
+            <div className="mb-16 md:mb-32">
+              <div className="text-center mb-8 md:mb-12">
+                <h2 className="text-4xl sm:text-5xl md:text-8xl font-black mb-4 md:mb-6">
+                  {t.whatIsYago.title} <span className="text-[#FF6B5A]">{t.whatIsYago.titleHighlight}</span>
+                </h2>
+                <p className="text-lg md:text-2xl text-gray-400 font-light max-w-3xl mx-auto">
+                  {t.whatIsYago.subtitle}
+                </p>
+              </div>
+
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6">
+                {t.whatIsYago.items.map((item, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5, delay: i * 0.1 }}
+                    className="group"
+                  >
+                    <div className="p-4 md:p-6 bg-white/5 border border-white/10 rounded-xl md:rounded-2xl hover:border-[#FF6B5A]/50 active:border-[#FF6B5A]/50 transition-all duration-300 h-full flex items-center gap-3 md:gap-4">
+                      <div className="w-8 h-8 md:w-10 md:h-10 bg-[#FF6B5A]/20 rounded-full flex items-center justify-center flex-shrink-0">
+                        <Check className="w-4 h-4 md:w-5 md:h-5 text-[#FF6B5A]" />
+                      </div>
+                      <span className="text-xs sm:text-sm md:text-base font-medium text-white/90">{item}</span>
+                    </div>
+                  </motion.div>
+                ))}
               </div>
             </div>
 
+            {/* What YAGO Can Do Section */}
             <div>
-              <h2 className="text-6xl md:text-8xl font-black mb-8">
-                {t.solution.title.split(' ')[0]} <span className="text-[#FF6B5A]">{t.solution.title.split(' ').slice(1).join(' ')}</span>
-              </h2>
-              <div className="grid md:grid-cols-2 gap-12 text-xl font-light">
-                <div className="space-y-4">
-                  {t.solution.items.slice(0, 3).map((item, i) => (
-                    <p key={i}><Check className="inline-block w-6 h-6 text-[#FF6B5A] mr-3" />{item}</p>
-                  ))}
-                </div>
-                <div className="space-y-4">
-                  {t.solution.items.slice(3).map((item, i) => (
-                    <p key={i}><Check className="inline-block w-6 h-6 text-[#FF6B5A] mr-3" />{item}</p>
-                  ))}
-                </div>
+              <div className="text-center mb-8 md:mb-12">
+                <h2 className="text-4xl sm:text-5xl md:text-8xl font-black mb-4 md:mb-6">
+                  {t.yagoCanDo.title} <span className="text-[#FF6B5A]">{t.yagoCanDo.titleHighlight}</span>
+                </h2>
+                <p className="text-lg md:text-2xl text-gray-400 font-light max-w-3xl mx-auto">
+                  {t.yagoCanDo.subtitle}
+                </p>
               </div>
+
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6">
+                {t.yagoCanDo.items.map((item, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5, delay: i * 0.1 }}
+                    whileHover={{ scale: 1.02, y: -5 }}
+                    className="group relative"
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-br from-[#FF6B5A]/20 to-orange-500/10 rounded-xl md:rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    <div className="relative p-4 md:p-6 bg-gradient-to-br from-white/10 to-white/5 border border-white/10 rounded-xl md:rounded-2xl hover:border-[#FF6B5A]/50 active:border-[#FF6B5A]/50 transition-all duration-300 h-full">
+                      <div className="w-10 h-10 md:w-14 md:h-14 bg-gradient-to-br from-[#FF6B5A] to-orange-500 rounded-xl md:rounded-2xl flex items-center justify-center mb-3 md:mb-4 shadow-lg shadow-[#FF6B5A]/20">
+                        <span className="text-lg md:text-2xl font-black text-black">0{i + 1}</span>
+                      </div>
+                      <p className="text-xs sm:text-sm md:text-lg font-semibold text-white leading-tight">{item}</p>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+
+              {/* Bottom CTA */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8, delay: 0.5 }}
+                className="mt-10 md:mt-16 text-center"
+              >
+                <p className="text-xl md:text-3xl font-bold text-white mb-2">
+                  And <span className="text-[#FF6B5A]">thousands</span> more tasks...
+                </p>
+                <p className="text-gray-400 text-sm md:text-lg">Just ask. YAGO handles the rest.</p>
+              </motion.div>
             </div>
           </div>
         </motion.section>
@@ -899,18 +1039,18 @@ export default function ComingSoon() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.2 }}
           transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
-          className="py-32 px-6 bg-[#FF6B5A]"
+          className="py-16 md:py-32 px-4 md:px-6 bg-[#FF6B5A]"
           style={{ willChange: 'opacity, transform' }}
         >
           <div className="max-w-7xl mx-auto">
-            <h2 className="text-6xl md:text-8xl font-black mb-24 text-black">
+            <h2 className="text-4xl sm:text-5xl md:text-8xl font-black mb-12 md:mb-24 text-black">
               {t.howItWorks.title}
             </h2>
 
-            <div className="grid md:grid-cols-3 gap-16">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-16">
               {t.howItWorks.steps.map((step, i) => (
-                <div key={i}>
-                  <div className="luxury-number text-[12rem] font-black leading-none mb-4 relative">
+                <div key={i} className="text-center md:text-left">
+                  <div className="luxury-number text-[6rem] sm:text-[8rem] md:text-[12rem] font-black leading-none mb-2 md:mb-4 relative">
                     <span className="absolute inset-0 bg-gradient-to-br from-black/20 to-black/5 bg-clip-text text-transparent blur-sm">
                       0{i + 1}
                     </span>
@@ -918,8 +1058,8 @@ export default function ComingSoon() {
                       0{i + 1}
                     </span>
                   </div>
-                  <h3 className="text-3xl font-bold mb-4 text-black">{step.title}</h3>
-                  <p className="text-xl text-black/70 font-light">{step.desc}</p>
+                  <h3 className="text-xl sm:text-2xl md:text-3xl font-bold mb-2 md:mb-4 text-black">{step.title}</h3>
+                  <p className="text-base md:text-xl text-black/70 font-light">{step.desc}</p>
                 </div>
               ))}
             </div>
@@ -932,20 +1072,20 @@ export default function ComingSoon() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.2 }}
           transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
-          className="py-32 px-6"
+          className="py-16 md:py-32 px-4 md:px-6"
           style={{ willChange: 'opacity, transform' }}
         >
           <div className="max-w-7xl mx-auto">
-            <div className="mb-20">
-              <h2 className="text-6xl md:text-8xl font-black mb-6">
+            <div className="mb-10 md:mb-20">
+              <h2 className="text-4xl sm:text-5xl md:text-8xl font-black mb-4 md:mb-6">
                 {t.benefits.title.split(' ')[0]} <span className="text-[#FF6B5A]">{t.benefits.title.split(' ').slice(1).join(' ')}</span>
               </h2>
-              <p className="text-2xl text-gray-400 font-light">
+              <p className="text-lg md:text-2xl text-gray-400 font-light">
                 {t.benefits.subtitle}
               </p>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-8">
               {t.benefits.items.map((benefit, i) => {
                 const Icon = benefitIcons[i];
                 return (
@@ -953,10 +1093,10 @@ export default function ComingSoon() {
                     key={i}
                     className="group"
                   >
-                    <div className="p-8 border border-white/10 hover:border-[#FF6B5A] transition-all duration-300">
-                      <Icon className="w-12 h-12 text-[#FF6B5A] mb-6" />
-                      <h3 className="text-2xl font-bold mb-3">{benefit.title}</h3>
-                      <p className="text-gray-400 font-light">{benefit.description}</p>
+                    <div className="p-5 md:p-8 border border-white/10 hover:border-[#FF6B5A] active:border-[#FF6B5A] transition-all duration-300 rounded-xl md:rounded-none">
+                      <Icon className="w-10 h-10 md:w-12 md:h-12 text-[#FF6B5A] mb-4 md:mb-6" />
+                      <h3 className="text-xl md:text-2xl font-bold mb-2 md:mb-3">{benefit.title}</h3>
+                      <p className="text-sm md:text-base text-gray-400 font-light">{benefit.description}</p>
                     </div>
                   </div>
                 );
@@ -971,27 +1111,27 @@ export default function ComingSoon() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.2 }}
           transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
-          className="py-32 px-6 bg-white/5"
+          className="py-16 md:py-32 px-4 md:px-6 bg-white/5"
           style={{ willChange: 'opacity, transform' }}
         >
           <div className="max-w-7xl mx-auto">
-            <div className="mb-20">
-              <h2 className="text-6xl md:text-8xl font-black mb-6">
+            <div className="mb-10 md:mb-20">
+              <h2 className="text-3xl sm:text-4xl md:text-8xl font-black mb-4 md:mb-6">
                 {t.features.title.split(' ').slice(0, -2).join(' ')} <span className="text-[#FF6B5A]">{t.features.title.split(' ').slice(-2).join(' ')}</span>
               </h2>
             </div>
 
-            <div className="grid md:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 md:gap-6">
               {t.features.items.map((feature, i) => {
                 const Icon = featureIcons[i];
                 return (
                   <div
                     key={i}
-                    className="p-6 border border-white/10 hover:border-[#FF6B5A] transition-all duration-300 group"
+                    className="p-4 md:p-6 border border-white/10 hover:border-[#FF6B5A] active:border-[#FF6B5A] transition-all duration-300 group rounded-xl md:rounded-none"
                   >
-                    <Icon className="w-8 h-8 text-[#FF6B5A] mb-4 opacity-50 group-hover:opacity-100 transition-opacity" />
-                    <h4 className="font-bold mb-2 text-sm">{feature.title}</h4>
-                    <p className="text-gray-500 text-xs font-light">{feature.description}</p>
+                    <Icon className="w-6 h-6 md:w-8 md:h-8 text-[#FF6B5A] mb-3 md:mb-4 opacity-70 group-hover:opacity-100 transition-opacity" />
+                    <h4 className="font-bold mb-1 md:mb-2 text-xs md:text-sm">{feature.title}</h4>
+                    <p className="text-gray-500 text-[10px] md:text-xs font-light leading-relaxed">{feature.description}</p>
                   </div>
                 );
               })}
@@ -999,35 +1139,40 @@ export default function ComingSoon() {
           </div>
         </motion.section>
 
+        {/* AI500 Competition Sections - Problem & Solution, Tech Approach */}
+        <ProblemSolution language={language} />
+        <TechApproach language={language} />
+        <Partners language={language} />
+
         {/* Premium NFT - Bold CTA */}
         <motion.section
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
-          className="py-32 px-6"
+          className="py-16 md:py-32 px-4 md:px-6"
           style={{ willChange: 'opacity, transform' }}
         >
           <div className="max-w-7xl mx-auto">
             <div className="text-center">
-              <Award className="w-24 h-24 text-[#FF6B5A] mx-auto mb-12" />
+              <Award className="w-16 h-16 md:w-24 md:h-24 text-[#FF6B5A] mx-auto mb-8 md:mb-12" />
 
-              <h2 className="text-6xl md:text-9xl font-black mb-8 leading-none">
+              <h2 className="text-4xl sm:text-5xl md:text-9xl font-black mb-6 md:mb-8 leading-none">
                 {t.premium.title1}<br />
                 <span className="text-[#FF6B5A]">{t.premium.title2}</span><br />
                 {t.premium.title3}
               </h2>
 
-              <p className="text-2xl text-gray-400 font-light max-w-3xl mx-auto mb-16">
+              <p className="text-lg md:text-2xl text-gray-400 font-light max-w-3xl mx-auto mb-10 md:mb-16 px-2">
                 {t.premium.subtitle}
               </p>
 
-              <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto mb-16">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 max-w-4xl mx-auto mb-10 md:mb-16">
                 {[t.premium.benefits.slice(0, 4), t.premium.benefits.slice(4)].map((col, i) => (
-                  <div key={i} className="text-left space-y-4">
+                  <div key={i} className="text-left space-y-3 md:space-y-4">
                     {col.map((item, j) => (
-                      <p key={j} className="flex items-center gap-3 text-lg">
-                        <Star className="w-5 h-5 text-[#FF6B5A] flex-shrink-0" />
+                      <p key={j} className="flex items-center gap-3 text-sm md:text-lg">
+                        <Star className="w-4 h-4 md:w-5 md:h-5 text-[#FF6B5A] flex-shrink-0" />
                         <span>{item}</span>
                       </p>
                     ))}
@@ -1115,11 +1260,11 @@ export default function ComingSoon() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.2 }}
           transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
-          className="py-32 px-6 border-t border-white/10"
+          className="py-16 md:py-32 px-4 md:px-6 border-t border-white/10"
           style={{ willChange: 'opacity, transform' }}
         >
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-6xl md:text-8xl font-black mb-20">
+            <h2 className="text-4xl sm:text-5xl md:text-8xl font-black mb-10 md:mb-20">
               {t.faq.title}
             </h2>
 
@@ -1132,36 +1277,45 @@ export default function ComingSoon() {
         </motion.section>
 
         {/* Footer */}
-        <footer className="py-16 px-6 border-t border-white/10">
+        <footer className="py-10 md:py-16 px-4 md:px-6 border-t border-white/10">
           <div className="max-w-7xl mx-auto">
-            <div className="flex flex-col md:flex-row justify-between items-center gap-8">
-              <div>
-                <div className="text-3xl font-bold mb-2">YAGO</div>
-                <p className="text-gray-600 text-sm">{t.footer.tagline}</p>
+            <div className="flex flex-col gap-8 md:gap-0 md:flex-row justify-between items-center">
+              {/* Logo & Tagline */}
+              <div className="text-center md:text-left">
+                <div className="text-2xl md:text-3xl font-bold mb-1 md:mb-2">YAGO</div>
+                <p className="text-gray-600 text-xs md:text-sm">{t.footer.tagline}</p>
               </div>
 
-              {/* LinkedIn Button */}
-              <a
-                href="https://www.linkedin.com/company/yagoconcierge"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-6 py-3 border border-white/10 hover:border-[#FF6B5A] text-white hover:text-[#FF6B5A] transition-all duration-300 group"
-              >
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
-                </svg>
-                <span className="font-medium">LinkedIn</span>
-                <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-              </a>
+              {/* Footer Navigation */}
+              <div className="flex flex-wrap justify-center items-center gap-4 md:gap-6">
+                <Link href="/team" className="text-gray-400 hover:text-[#FF6B5A] active:text-[#FF6B5A] transition-colors text-sm py-2">
+                  {t.nav.team}
+                </Link>
+                <Link href="/roadmap" className="text-gray-400 hover:text-[#FF6B5A] active:text-[#FF6B5A] transition-colors text-sm py-2">
+                  {t.nav.roadmap}
+                </Link>
+                <a
+                  href="https://www.linkedin.com/company/yagoconcierge"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-4 py-2 border border-white/10 hover:border-[#FF6B5A] active:border-[#FF6B5A] text-white hover:text-[#FF6B5A] transition-all duration-300 group rounded-full"
+                >
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                  </svg>
+                  <span className="font-medium text-sm">LinkedIn</span>
+                </a>
+              </div>
 
+              {/* Copyright & Powered by */}
               <div className="text-gray-600 text-sm text-center md:text-right">
                 <div className="flex flex-col gap-2">
-                  <div>© 2025 YAGO Concierge</div>
+                  <div className="text-xs md:text-sm">© 2025 YAGO Concierge</div>
                   <a
                     href="https://natex.io"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 text-gray-500 hover:text-[#FF6B5A] transition-all duration-300 group"
+                    className="inline-flex items-center justify-center md:justify-end gap-2 text-gray-500 hover:text-[#FF6B5A] transition-all duration-300 group py-2"
                   >
                     <span className="text-xs">Powered by</span>
                     <span className="font-semibold bg-gradient-to-r from-[#FF6B5A] to-[#FF8A7A] bg-clip-text text-transparent group-hover:from-[#FF8A7A] group-hover:to-[#FF6B5A] transition-all duration-500">
@@ -1171,14 +1325,6 @@ export default function ComingSoon() {
                     <span className="font-semibold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent group-hover:from-purple-400 group-hover:to-blue-400 transition-all duration-500">
                       AI
                     </span>
-                    <svg
-                      className="w-3 h-3 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-300"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                    </svg>
                   </a>
                 </div>
               </div>
