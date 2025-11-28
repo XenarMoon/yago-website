@@ -5,7 +5,8 @@ import {
   AlertTriangle, Phone, Clock, Ban, DollarSign, MapPin,
   Brain, MessageCircle, Users, Database, Zap, Crown,
   Stethoscope, Utensils, Wrench, Car, ShoppingBag, Calendar,
-  PartyPopper, Search, Star, Shield, CheckCircle2, Sparkles
+  PartyPopper, Search, Star, Shield, CheckCircle2, Sparkles,
+  UserX, Timer
 } from 'lucide-react';
 
 interface ProblemSolutionProps {
@@ -24,34 +25,34 @@ const translations = {
 
     problems: [
       {
+        icon: Timer,
+        title: "Live Queues Everywhere",
+        description: "Standing in line for hours at banks, clinics, government offices. No prior appointments, no online booking. Just show up and wait."
+      },
+      {
         icon: Phone,
         title: "Endless Phone Calls",
-        description: "Spending 30+ minutes calling restaurants, clinics, and services just to make a simple booking. Most don't answer or have outdated information."
+        description: "Spending 30+ minutes calling restaurants, clinics, and services. Most don't answer. When they do, the information is outdated."
+      },
+      {
+        icon: UserX,
+        title: "No Appointment Culture",
+        description: "Want to see a doctor? Go stand in line at 6 AM. Need a haircut? Just walk in and hope. Prior booking barely exists."
       },
       {
         icon: Clock,
-        title: "Wasted Time",
-        description: "Organizing a birthday party or business dinner means calling 10+ vendors separately — caterers, venues, decorators, transport."
+        title: "Wasted Precious Time",
+        description: "Hours lost waiting in physical queues, making multiple calls, visiting places in person just to book something simple."
       },
       {
         icon: Ban,
-        title: "No Concierge Service",
-        description: "Premium concierge services like those in Dubai or London simply don't exist in Uzbekistan. High-net-worth individuals have no local solution."
-      },
-      {
-        icon: MapPin,
-        title: "Hard to Find Services",
-        description: "Finding trusted service providers is a nightmare. No centralized platform to compare, book, and pay for lifestyle services."
+        title: "No Modern Service",
+        description: "Premium concierge services like Dubai or London don't exist here. Everyone suffers the same inefficient system."
       },
       {
         icon: DollarSign,
-        title: "Hidden Costs",
-        description: "No transparent pricing. Services often charge differently based on who's calling. No accountability or quality guarantees."
-      },
-      {
-        icon: AlertTriangle,
-        title: "Language Barriers",
-        description: "Expats and tourists struggle to communicate their needs. Local services rarely speak English or understand international standards."
+        title: "Hidden & Unfair Pricing",
+        description: "No transparent pricing anywhere. You might pay double what the previous customer paid. No accountability."
       }
     ],
 
@@ -127,34 +128,34 @@ const translations = {
 
     problems: [
       {
+        icon: Timer,
+        title: "Hamma Joyda Jonli Navbat",
+        description: "Banklar, klinikalar, davlat idoralarida soatlab navbatda turish. Oldindan yozilish yo'q, onlayn bron yo'q. Shunchaki kel va kut."
+      },
+      {
         icon: Phone,
         title: "Cheksiz Qo'ng'iroqlar",
-        description: "Oddiy bron qilish uchun restoran, klinika va xizmatlarga 30+ daqiqa qo'ng'iroq qilish. Ko'pchilik javob bermaydi yoki ma'lumotlar eskirgan."
+        description: "Restoran, klinika va xizmatlarga 30+ daqiqa qo'ng'iroq qilish. Ko'pchilik javob bermaydi. Javob berganda ham ma'lumot eskirgan."
+      },
+      {
+        icon: UserX,
+        title: "Oldindan Yozilish Madaniyati Yo'q",
+        description: "Shifokorga ko'rinmoqchimisiz? Ertalab soat 6 da navbatga turing. Soch oldirmoqchimisiz? Shunchaki kiring va umid qiling."
       },
       {
         icon: Clock,
-        title: "Vaqt Isrofi",
-        description: "Tug'ilgan kun yoki biznes kechki ovqatni tashkil qilish 10+ ta vendorga alohida qo'ng'iroq qilishni talab qiladi — katering, joy, dekor, transport."
+        title: "Qimmatli Vaqt Isrofi",
+        description: "Jismoniy navbatlarda kutish, ko'p qo'ng'iroqlar qilish, oddiy narsani bron qilish uchun joylarga borish bilan soatlar yo'qotiladi."
       },
       {
         icon: Ban,
-        title: "Konsyerj Yo'q",
-        description: "Dubay yoki Londondagi kabi premium konsyerj xizmatlari O'zbekistonda mavjud emas. Yuqori daromadli shaxslar uchun mahalliy yechim yo'q."
-      },
-      {
-        icon: MapPin,
-        title: "Xizmat Topish Qiyin",
-        description: "Ishonchli xizmat ko'rsatuvchilarni topish dahshat. Turmush xizmatlarini solishtirish, bron qilish va to'lash uchun markazlashgan platforma yo'q."
+        title: "Zamonaviy Xizmat Yo'q",
+        description: "Dubay yoki London kabi premium konsyerj xizmatlari bu yerda mavjud emas. Hamma bir xil samarasiz tizimdan aziyat chekadi."
       },
       {
         icon: DollarSign,
-        title: "Yashirin Narxlar",
-        description: "Shaffof narxlar yo'q. Xizmatlar ko'pincha kim qo'ng'iroq qilayotganiga qarab turlicha narx oladi. Javobgarlik yoki sifat kafolati yo'q."
-      },
-      {
-        icon: AlertTriangle,
-        title: "Til To'siqlari",
-        description: "Chet elliklar va sayyohlar ehtiyojlarini tushuntirishda qiynaladi. Mahalliy xizmatlar kamdan-kam ingliz tilida gaplashadi."
+        title: "Yashirin va Adolatsiz Narxlar",
+        description: "Hech qayerda shaffof narxlar yo'q. Oldingi mijozdan ikki baravar ko'p to'lashingiz mumkin. Javobgarlik yo'q."
       }
     ],
 
@@ -241,10 +242,6 @@ export default function ProblemSolution({ language = 'en' }: ProblemSolutionProp
           transition={{ duration: 0.8 }}
           className="text-center mb-12 md:mb-20"
         >
-          <span className="inline-flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 bg-[#FF6B5A]/10 border border-[#FF6B5A]/20 rounded-full text-[#FF6B5A] text-xs md:text-sm font-medium mb-4 md:mb-6">
-            <Sparkles className="w-3 h-3 md:w-4 md:h-4" />
-            {t.badge}
-          </span>
           <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-black mb-4 md:mb-6">
             {t.title} <span className="text-[#FF6B5A]">{t.titleHighlight}</span>
           </h2>

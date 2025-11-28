@@ -226,6 +226,12 @@ export default function TeamPage() {
 
           {/* Desktop Nav */}
           <div className="hidden md:flex items-center gap-4">
+            <Link href="/problem-solution" className="text-white/70 hover:text-white transition-colors text-sm">
+              Problem & Solution
+            </Link>
+            <Link href="/team" className="text-[#FF6B5A] transition-colors text-sm font-medium">
+              Team
+            </Link>
             <Link href="/roadmap" className="text-white/70 hover:text-white transition-colors text-sm">
               Roadmap
             </Link>
@@ -266,6 +272,20 @@ export default function TeamPage() {
             animate={{ opacity: 1, y: 0 }}
             className="md:hidden absolute top-full left-0 right-0 bg-black/95 backdrop-blur-xl border-b border-white/10 p-4"
           >
+            <Link
+              href="/problem-solution"
+              className="block py-3 text-white/70 hover:text-white transition-colors text-center border-b border-white/10"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Problem & Solution
+            </Link>
+            <Link
+              href="/team"
+              className="block py-3 text-[#FF6B5A] font-medium transition-colors text-center border-b border-white/10"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Team
+            </Link>
             <Link
               href="/roadmap"
               className="block py-3 text-white/70 hover:text-white transition-colors text-center"

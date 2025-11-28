@@ -332,8 +332,14 @@ export default function RoadmapPage() {
 
           {/* Desktop Nav */}
           <div className="hidden md:flex items-center gap-4">
-            <Link href="/team" className="text-white/70 hover:text-white transition-colors">
+            <Link href="/problem-solution" className="text-white/70 hover:text-white transition-colors text-sm">
+              Problem & Solution
+            </Link>
+            <Link href="/team" className="text-white/70 hover:text-white transition-colors text-sm">
               {t.team}
+            </Link>
+            <Link href="/roadmap" className="text-[#FF6B5A] transition-colors text-sm font-medium">
+              Roadmap
             </Link>
             <motion.button
               whileHover={{ scale: 1.05 }}
@@ -373,11 +379,25 @@ export default function RoadmapPage() {
             className="md:hidden absolute top-full left-0 right-0 bg-black/95 backdrop-blur-xl border-b border-white/10 p-4"
           >
             <Link
+              href="/problem-solution"
+              className="block py-3 text-white/70 hover:text-white transition-colors text-center border-b border-white/10"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Problem & Solution
+            </Link>
+            <Link
               href="/team"
-              className="block py-3 text-white/70 hover:text-white transition-colors text-center"
+              className="block py-3 text-white/70 hover:text-white transition-colors text-center border-b border-white/10"
               onClick={() => setMobileMenuOpen(false)}
             >
               {t.team}
+            </Link>
+            <Link
+              href="/roadmap"
+              className="block py-3 text-[#FF6B5A] font-medium transition-colors text-center"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Roadmap
             </Link>
           </motion.div>
         )}

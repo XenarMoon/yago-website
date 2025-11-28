@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, useScroll, useTransform, useInView } from 'framer-motion';
 import {
   ArrowRight, ArrowUpRight, Check, Star, Award, Brain,
@@ -319,120 +319,6 @@ export default function ComingSoon() {
   const badgeOpacity = useTransform(scrollY, [0, 200, 400], [1, 0.8, 0]);
   const badgeScale = useTransform(scrollY, [0, 300], [1, 0.85]);
 
-  // Mouse movement tracking with smooth interpolation
-  const mousePosition = useRef({ x: 0, y: 0 });
-  const smoothMouse = useRef({ x: 0, y: 0 });
-  const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
-  const [isMounted, setIsMounted] = useState(false);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const particlesRef = useRef<Array<{
-    x: number;
-    y: number;
-    vx: number;
-    vy: number;
-    life: number;
-    size: number;
-  }>>([]);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      mousePosition.current = { x: e.clientX, y: e.clientY };
-
-      // Add particles on mouse move
-      if (Math.random() > 0.7) {
-        particlesRef.current.push({
-          x: e.clientX,
-          y: e.clientY,
-          vx: (Math.random() - 0.5) * 2,
-          vy: (Math.random() - 0.5) * 2,
-          life: 1,
-          size: Math.random() * 3 + 1
-        });
-      }
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
-
-  // Canvas particle system
-  useEffect(() => {
-    if (!isMounted) return;
-
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    const resize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    };
-    resize();
-    window.addEventListener('resize', resize);
-
-    let animationFrame: number;
-
-    const animate = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      // Smooth cursor interpolation
-      smoothMouse.current.x += (mousePosition.current.x - smoothMouse.current.x) * 0.15;
-      smoothMouse.current.y += (mousePosition.current.y - smoothMouse.current.y) * 0.15;
-
-      // Update cursor position for the visual cursor
-      setCursorPos({ x: smoothMouse.current.x, y: smoothMouse.current.y });
-
-      // Update and draw particles
-      particlesRef.current = particlesRef.current.filter(particle => {
-        particle.x += particle.vx;
-        particle.y += particle.vy;
-        particle.life -= 0.01;
-        particle.vy += 0.05; // gravity
-
-        if (particle.life > 0) {
-          ctx.beginPath();
-          ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(255, 107, 90, ${particle.life * 0.6})`;
-          ctx.fill();
-
-          // Glow effect
-          ctx.shadowBlur = 20;
-          ctx.shadowColor = 'rgba(255, 107, 90, 0.8)';
-          ctx.shadowBlur = 0;
-
-          return true;
-        }
-        return false;
-      });
-
-      // Draw cursor trail gradient
-      const gradient = ctx.createRadialGradient(
-        smoothMouse.current.x, smoothMouse.current.y, 0,
-        smoothMouse.current.x, smoothMouse.current.y, 150
-      );
-      gradient.addColorStop(0, 'rgba(255, 107, 90, 0.15)');
-      gradient.addColorStop(0.5, 'rgba(255, 107, 90, 0.05)');
-      gradient.addColorStop(1, 'rgba(255, 107, 90, 0)');
-
-      ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      animationFrame = requestAnimationFrame(animate);
-    };
-
-    animate();
-
-    return () => {
-      cancelAnimationFrame(animationFrame);
-      window.removeEventListener('resize', resize);
-    };
-  }, [isMounted]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -472,50 +358,7 @@ export default function ComingSoon() {
 
   return (
     <>
-      <div className="min-h-screen relative text-white overflow-x-hidden md:cursor-none">
-        {/* Canvas Particle System - Only on desktop and after mount */}
-        {isMounted && typeof window !== 'undefined' && (
-          <>
-            <canvas
-              ref={canvasRef}
-              className="hidden md:block fixed inset-0 pointer-events-none z-50"
-              style={{ mixBlendMode: 'screen' }}
-            />
-
-            {/* Magnetic Cursor - Only on desktop */}
-            <div
-              className="hidden md:block fixed w-5 h-5 pointer-events-none z-[60]"
-              style={{
-                left: `${cursorPos.x}px`,
-                top: `${cursorPos.y}px`,
-                transform: 'translate(-50%, -50%)',
-                transition: 'none'
-              }}
-            >
-              <div className="relative w-full h-full">
-                {/* Inner dot */}
-                <motion.div
-                  animate={{ scale: [1, 1.2, 1] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                  className="absolute inset-0 bg-white rounded-full shadow-lg shadow-white/50"
-                />
-                {/* Outer ring */}
-                <motion.div
-                  animate={{ scale: [1, 1.5, 1], opacity: [0.8, 0.2, 0.8] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                  className="absolute -inset-2 border-2 border-[#FF6B5A] rounded-full"
-                />
-                {/* Pulse ring */}
-                <motion.div
-                  animate={{ scale: [0.5, 2], opacity: [0.5, 0] }}
-                  transition={{ duration: 1.5, repeat: Infinity, ease: "easeOut" }}
-                  className="absolute -inset-3 border border-[#FF6B5A]/50 rounded-full"
-                />
-              </div>
-            </div>
-          </>
-        )}
-
+      <div className="min-h-screen relative text-white overflow-x-hidden">
         {/* Luxury Animated Background */}
         <div className="fixed inset-0 -z-10">
           {/* Base gradient */}
@@ -723,12 +566,9 @@ export default function ComingSoon() {
         <nav className="fixed top-3 md:top-6 right-3 md:right-8 z-50 flex items-center gap-1.5 md:gap-3">
           {/* Desktop Navigation Links */}
           <div className="hidden md:flex items-center gap-1 px-2 py-1 bg-white/5 border border-white/10 backdrop-blur-xl rounded-full">
-            <a href="#muammo-yechim" className="px-4 py-2 text-sm text-white/70 hover:text-[#FF6B5A] transition-colors">
+            <Link href="/problem-solution" className="px-4 py-2 text-sm text-white/70 hover:text-[#FF6B5A] transition-colors">
               {t.nav.problem}
-            </a>
-            <a href="#tech-approach" className="px-4 py-2 text-sm text-white/70 hover:text-[#FF6B5A] transition-colors">
-              {t.nav.tech}
-            </a>
+            </Link>
             <Link href="/team" className="px-4 py-2 text-sm text-white/70 hover:text-[#FF6B5A] transition-colors flex items-center gap-1">
               <Users className="w-4 h-4" />
               {t.nav.team}
@@ -768,20 +608,13 @@ export default function ComingSoon() {
             className="fixed top-12 right-3 z-50 md:hidden"
           >
             <div className="bg-black/90 border border-white/10 backdrop-blur-xl rounded-2xl p-4 min-w-[200px]">
-              <a
-                href="#muammo-yechim"
+              <Link
+                href="/problem-solution"
                 onClick={() => setMobileMenuOpen(false)}
                 className="block px-4 py-3 text-white/70 hover:text-[#FF6B5A] transition-colors border-b border-white/10"
               >
                 {t.nav.problem}
-              </a>
-              <a
-                href="#tech-approach"
-                onClick={() => setMobileMenuOpen(false)}
-                className="block px-4 py-3 text-white/70 hover:text-[#FF6B5A] transition-colors border-b border-white/10"
-              >
-                {t.nav.tech}
-              </a>
+              </Link>
               <Link
                 href="/team"
                 onClick={() => setMobileMenuOpen(false)}
@@ -1066,44 +899,6 @@ export default function ComingSoon() {
           </div>
         </motion.section>
 
-        {/* Benefits Grid */}
-        <motion.section
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.2 }}
-          transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
-          className="py-16 md:py-32 px-4 md:px-6"
-          style={{ willChange: 'opacity, transform' }}
-        >
-          <div className="max-w-7xl mx-auto">
-            <div className="mb-10 md:mb-20">
-              <h2 className="text-4xl sm:text-5xl md:text-8xl font-black mb-4 md:mb-6">
-                {t.benefits.title.split(' ')[0]} <span className="text-[#FF6B5A]">{t.benefits.title.split(' ').slice(1).join(' ')}</span>
-              </h2>
-              <p className="text-lg md:text-2xl text-gray-400 font-light">
-                {t.benefits.subtitle}
-              </p>
-            </div>
-
-            <div className="grid grid-cols-3 gap-2 sm:gap-4 md:gap-8">
-              {t.benefits.items.map((benefit, i) => {
-                const Icon = benefitIcons[i];
-                return (
-                  <div
-                    key={i}
-                    className="group"
-                  >
-                    <div className="p-3 sm:p-5 md:p-8 border border-white/10 hover:border-[#FF6B5A] active:border-[#FF6B5A] transition-all duration-300 rounded-xl md:rounded-none flex flex-col items-center text-center sm:items-start sm:text-left">
-                      <Icon className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-[#FF6B5A] mb-2 sm:mb-4 md:mb-6" />
-                      <h3 className="text-[10px] sm:text-base md:text-2xl font-bold mb-1 sm:mb-2 md:mb-3 leading-tight">{benefit.title}</h3>
-                      <p className="text-[10px] sm:text-xs md:text-base text-gray-400 font-light hidden sm:block">{benefit.description}</p>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </motion.section>
 
         {/* Features Grid - Minimal Cards */}
         <motion.section
@@ -1181,7 +976,7 @@ export default function ComingSoon() {
               </div>
 
               <motion.a
-                href="https://figural-dara-impedingly.ngrok-free.dev/demo/access"
+                href="https://march-practice-outlets-magnificent.trycloudflare.com"
                 target="_blank"
                 rel="noopener noreferrer"
                 whileHover={{ scale: 1.05, boxShadow: "0 0 40px rgba(255,107,90,0.6)" }}
@@ -1288,6 +1083,9 @@ export default function ComingSoon() {
 
               {/* Footer Navigation */}
               <div className="flex flex-wrap justify-center items-center gap-4 md:gap-6">
+                <Link href="/problem-solution" className="text-gray-400 hover:text-[#FF6B5A] active:text-[#FF6B5A] transition-colors text-sm py-2">
+                  {t.nav.problem}
+                </Link>
                 <Link href="/team" className="text-gray-400 hover:text-[#FF6B5A] active:text-[#FF6B5A] transition-colors text-sm py-2">
                   {t.nav.team}
                 </Link>
