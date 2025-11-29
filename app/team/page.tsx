@@ -20,7 +20,7 @@ const translations = {
     titleHighlight: "TEAM",
     subtitle: "Exceptional leadership backed by Uzbekistan's premier venture studio",
 
-    founderLabel: "FOUNDER & VISIONARY",
+    founderLabel: "FOUNDER",
     partnerLabel: "INCUBATION & ACCELERATION PARTNER",
     partnerDesc: "Natex Labs is Uzbekistan's leading venture studio, providing world-class incubation, technical infrastructure, and strategic guidance to transform YAGO into a market-defining company.",
 
@@ -83,7 +83,7 @@ const translations = {
     titleHighlight: "TANISHING",
     subtitle: "O'zbekistonning yetakchi venchur studiyasi tomonidan qo'llab-quvvatlanadigan ajoyib rahbariyat",
 
-    founderLabel: "ASOSCHISI VA VIZIONER",
+    founderLabel: "ASOSCHISI",
     partnerLabel: "INKUBATSIYA VA AKSELERATSIYA HAMKORI",
     partnerDesc: "Natex Labs O'zbekistonning yetakchi venchur studiyasi bo'lib, YAGO ni bozorni belgilaydigan kompaniyaga aylantirish uchun jahon darajasidagi inkubatsiya, texnik infratuzilma va strategik yo'l-yo'riq taqdim etadi.",
 
@@ -157,7 +157,7 @@ const founder = {
     uz: ["AI Innovatsiya", "Mijoz Tajribasi", "Bozorni Kengaytirish", "Hamkorlik Rivojlantirish"]
   },
   image: "/team/CEO.png",
-  linkedin: "https://linkedin.com/in/javohirbekburiboev",
+  linkedin: "https://www.linkedin.com/in/javokhirbek-buriboev/",
   color: "from-[#FF6B5A] via-orange-500 to-amber-500"
 };
 
@@ -315,7 +315,7 @@ export default function TeamPage() {
               {t.title} <span className="text-[#FF6B5A]">{t.titleHighlight}</span>
             </h1>
 
-            <p className="text-base md:text-xl lg:text-2xl text-gray-400 max-w-3xl mx-auto px-2">
+            <p className="text-base md:text-xl lg:text-2xl text-gray-400 max-w-3xl mx-auto px-2 whitespace-nowrap">
               {t.subtitle}
             </p>
           </motion.div>

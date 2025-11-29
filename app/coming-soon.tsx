@@ -173,7 +173,7 @@ const translations = {
       line1: "AI",
       line2: "HAYOT TARZI",
       line3: "YORDAMCHISI",
-      tagline: "Dubay va London standartlaridagi xizmat",
+      tagline: "Dubay va London standartlaridan ilhomlangan jahon darajasidagi xizmat",
       subtitle: "24/7 AI konsyerj qo'lingizda",
       emailPlaceholder: "Emailingizni kiriting",
       joinButton: "QO'SHILING",
@@ -198,7 +198,7 @@ const translations = {
       titleHighlight: "QILA OLADI",
       subtitle: "YAGO ga nima kerakligini ayting. Natijani kuzating.",
       items: [
-        "Oziq-ovqat buyurtma qiling va eshikka yetkazib bering",
+        "Oziq-ovqat mahsulotlarini buyurtma qiling va eshigingizgacha yetkazib beradi",
         "Ishonchli santexnik va elektriklarni toping",
         "Eng yaxshi restoranlarda stol band qiling",
         "Shifokor qabuliga bir zumda yoziling",
@@ -227,7 +227,7 @@ const translations = {
       ]
     },
     features: {
-      title: "SIZGA KERAK HAMMA NARSA",
+      title: "Sizga kerakli hamma narsa",
       items: [
         { title: "Sayohat rejalashtirish", description: "Parvozlar, mehmonxonalar, marshrutlar" },
         { title: "Restoran bron qilish", description: "Butun dunyo bo'ylab eng yaxshi stollar" },
@@ -235,7 +235,7 @@ const translations = {
         { title: "Uy xizmatlari", description: "Talab bo'yicha texnik xizmat" },
         { title: "Transport", description: "Taksi, ijara, shofyor" },
         { title: "Sovg'a tavsiyalari", description: "Har qanday holat uchun" },
-        { title: "Biznes qo'llab-quvvatlash", description: "Tadqiqot, rejalashtirish, ma'muriy" },
+        { title: "Biznesni qo'llab-quvvatlash", description: "Tadqiqot, rejalashtirish, ma'muriy" },
         { title: "Salomatlik", description: "Spa, fitnes, uchrashuvlar" },
         { title: "Ko'ngil ochar", description: "Chiptalar, tadbirlar, VIP" },
         { title: "Xavfsizlik", description: "24/7 favqulodda yordam" },
@@ -256,7 +256,7 @@ const translations = {
         "Premium a'zo nishoni",
         "Premium hamkorlarga kirish",
         "Maxsus akkaunt menejeri",
-        "O'tkazuvchan NFT egaligi",
+        "Ko'chiriladigan NFT egaligi",
         "Faqat a'zolar uchun tadbirlar"
       ]
     },
@@ -858,9 +858,15 @@ export default function ComingSoon() {
                 className="mt-10 md:mt-16 text-center"
               >
                 <p className="text-xl md:text-3xl font-bold text-white mb-2">
-                  And <span className="text-[#FF6B5A]">thousands</span> more tasks...
+                  {language === 'en' ? (
+                    <>And <span className="text-[#FF6B5A]">thousands</span> more tasks...</>
+                  ) : (
+                    <>Va yana <span className="text-[#FF6B5A]">minglab</span> vazifalar...</>
+                  )}
                 </p>
-                <p className="text-gray-400 text-sm md:text-lg">Just ask. YAGO handles the rest.</p>
+                <p className="text-gray-400 text-sm md:text-lg">
+                  {language === 'en' ? 'Just ask. YAGO handles the rest.' : 'Faqat so\'rang. Qolganini YAGO hal qiladi.'}
+                </p>
               </motion.div>
             </div>
           </div>
@@ -1031,7 +1037,9 @@ export default function ComingSoon() {
                 transition={{ delay: 0.3 }}
                 className="mt-8 text-center"
               >
-                <p className="text-gray-400 mb-4">Can&apos;t access? Request demo via Telegram:</p>
+                <p className="text-gray-400 mb-4">
+                  {language === 'en' ? "Can't access? Request demo via Telegram:" : "Kirish imkoni yo'qmi? Telegram orqali demo so'rang:"}
+                </p>
                 <a
                   href="https://T.me/officialyago"
                   target="_blank"

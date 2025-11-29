@@ -111,16 +111,16 @@ const translations = {
     badge: "TEXNIK YONDASHUV",
     title: "QANDAY",
     titleHighlight: "HAL QILAMIZ",
-    subtitle: "AI quvvatidagi arxitekturamiz Dubay va London darajasidagi konsyerj xizmati taqdim etadi",
+    subtitle: "AI quvvatidagi arxitekturamiz Dubay va London darajasidagi konsyerj xizmatini taqdim etadi",
 
     approachTitle: "AI + INSON GIBRID ARXITEKTURASI",
-    approachSubtitle: "Premium xizmat yetkazish uchun ikkala dunyoning eng yaxshisi",
+    approachSubtitle: "Premium xizmat ko'rsatishda ikkala dunyoning eng yaxshisi",
 
     architecture: [
       {
         icon: Bot,
         title: "AI Agent Qatlami",
-        description: "GPT-4 quvvatidagi suhbat AI dastlabki so'rovlarni qabul qiladi, kontekstni tushunadi va bronlarni avtomatik qayta ishlaydi.",
+        description: "GPT-4 quvvatidagi suhbatda AI dastlabki so'rovlarni qabul qiladi, kontekstni tushunadi va bronlarni avtomatik qayta ishlaydi.",
         color: "from-purple-500/20 to-purple-500/5"
       },
       {
@@ -131,13 +131,13 @@ const translations = {
       },
       {
         icon: Database,
-        title: "Aqlli Ma'lumotlar Pipeline",
-        description: "Real vaqt ma'lumot yig'ish, afzallik o'rganish va shaxsiylashtirilgan tajribalar uchun bron tarixi.",
+        title: "Aqlli Ma'lumotlar Oqimi",
+        description: "Shaxsiylashtirilgan tajribalar uchun real vaqtda ma'lumot yig'ish, afzalliklarni o'rganish va bron qilish tarixi.",
         color: "from-green-500/20 to-green-500/5"
       },
       {
         icon: Zap,
-        title: "Real Vaqt WebSockets",
+        title: "Real Vaqtli WebSocket'lar",
         description: "Foydalanuvchilar, AI agentlar va inson operatorlari o'rtasida bir zumda ikki tomonlama aloqa.",
         color: "from-orange-500/20 to-orange-500/5"
       }
@@ -198,7 +198,7 @@ const translations = {
       { step: "01", title: "Foydalanuvchi Xabari", desc: "Foydalanuvchi Telegram orqali so'rov yuboradi" },
       { step: "02", title: "AI Qayta Ishlash", desc: "Niyatni aniqlash va tafsilotlarni ajratish" },
       { step: "03", title: "Aqlli Yo'naltirish", desc: "Avtomatik hal qilish yoki agentga uzatish" },
-      { step: "04", title: "Bron", desc: "Hamkor joyga API qo'ng'iroq" },
+      { step: "04", title: "Bron", desc: "Hamkor joyga API so'rovi" },
       { step: "05", title: "Tasdiqlash", desc: "Foydalanuvchiga bir zumda tasdiqlash" }
     ]
   }
@@ -231,7 +231,7 @@ export default function TechApproach({ language = 'en' }: TechApproachProps) {
           <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-black mb-4 md:mb-6">
             {t.title} <span className="text-[#FF6B5A]">{t.titleHighlight}</span>
           </h2>
-          <p className="text-base md:text-xl text-gray-400 max-w-3xl mx-auto px-2">
+          <p className="text-base md:text-xl text-gray-400 max-w-3xl mx-auto px-2 whitespace-nowrap">
             {t.subtitle}
           </p>
         </motion.div>
@@ -318,7 +318,7 @@ export default function TechApproach({ language = 'en' }: TechApproachProps) {
           </div>
 
           {/* Desktop: Horizontal Flow */}
-          <div className="hidden md:flex flex-row items-center justify-between gap-4">
+          <div className="hidden md:grid md:grid-cols-5 gap-4 items-stretch">
             {t.flowSteps.map((step, index) => (
               <motion.div
                 key={index}
@@ -326,9 +326,9 @@ export default function TechApproach({ language = 'en' }: TechApproachProps) {
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="flex-1 relative"
+                className="relative"
               >
-                <div className="text-center p-6 bg-white/5 border border-white/10 rounded-2xl hover:border-[#FF6B5A]/30 transition-all duration-300">
+                <div className="text-center p-6 bg-white/5 border border-white/10 rounded-2xl hover:border-[#FF6B5A]/30 transition-all duration-300 h-full flex flex-col justify-center">
                   <div className="text-4xl font-black text-[#FF6B5A]/30 mb-2">{step.step}</div>
                   <h4 className="text-lg font-bold text-white mb-1">{step.title}</h4>
                   <p className="text-sm text-gray-400">{step.desc}</p>

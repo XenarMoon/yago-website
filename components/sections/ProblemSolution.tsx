@@ -121,7 +121,7 @@ const translations = {
     badge: "AI500 TANLOV",
     title: "MUAMMO VA",
     titleHighlight: "YECHIM",
-    subtitle: "O'zbekistonda kundalik hayotdagi haqiqiy muammolar va Yago yechimlari",
+    subtitle: "O'zbekistonda kundalik hayotdagi haqiqiy muammolar va Yago beradigan yechimlar",
 
     problemTitle: "HAQIQIY MUAMMO",
     problemSubtitle: "O'zbekistonda odamlar har kuni nimaga duch keladi",
@@ -178,13 +178,13 @@ const translations = {
       {
         icon: Users,
         title: "Inson-Agent Eskalatsiyasi",
-        description: "Murakkab so'rovlar VIP tartiblarni shaxsan hal qiladigan inson konsyerjlariga uzatiladi.",
+        description: "Murakkab so'rovlar muammosiz insoniy konsyerj agentlariga topshiriladi, ular VIP tashkiliy ishlarni shaxsan bajaradilar.",
         highlight: "24/7 Qo'llab-quvvatlash"
       },
       {
         icon: Database,
         title: "Aqlli Ma'lumot Yig'ish",
-        description: "AI sizning afzalliklaringiz, ovqatlanish cheklovlari, sevimli joylar va oldingi bronlaringizni eslab qoladi.",
+        description: "AI sizning odatlaringizni, parhez cheklovlaringizni, sevimli joylaringizni va oldingi bronlaringizni eslab, sizga moslashtirilgan xizmat taqdim etadi.",
         highlight: "Shaxsiylashtirilgan"
       },
       {
@@ -214,7 +214,7 @@ const translations = {
 
     statsTitle: "O'ZBEKISTON UCHUN YARATILGAN",
     stats: [
-      { value: "35M+", label: "Xizmat qilish uchun aholi" },
+      { value: "35M+", label: "Aholiga xizmat qilish uchun" },
       { value: "24/7", label: "Mavjudlik" },
       { value: "<30s", label: "Javob vaqti" },
       { value: "100+", label: "Hamkor joylar" }
@@ -245,7 +245,7 @@ export default function ProblemSolution({ language = 'en' }: ProblemSolutionProp
           <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-black mb-4 md:mb-6">
             {t.title} <span className="text-[#FF6B5A]">{t.titleHighlight}</span>
           </h2>
-          <p className="text-base md:text-xl text-gray-400 max-w-3xl mx-auto px-2">
+          <p className="text-base md:text-xl text-gray-400 max-w-3xl mx-auto px-2 whitespace-nowrap">
             {t.subtitle}
           </p>
         </motion.div>
