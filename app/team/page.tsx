@@ -143,7 +143,7 @@ const translations = {
 
 const founder = {
   name: "Javohirbek Buriboev",
-  role: { en: "Founder & CEO", uz: "Asoschisi va CEO" },
+  role: { en: "CEO", uz: "CEO" },
   bio: {
     en: "Visionary entrepreneur with a passion for transforming how people experience premium services. Leading YAGO's mission to bring Dubai & London-level concierge to Uzbekistan.",
     uz: "Odamlar premium xizmatlarni qanday his qilishini o'zgartirishga ishtiyoqli vizioner tadbirkor. YAGO ning Dubay va London darajasidagi konsyerjni O'zbekistonga olib kelish missiyasiga rahbarlik qilmoqda."
