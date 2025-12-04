@@ -111,6 +111,9 @@ export const translations = {
 
     openInNewTab: 'Open in Full Screen',
     poweredBy: 'Powered by GPT-4 & Custom NLU',
+    focusModeButton: 'Focus Mode - Test Without Distractions',
+    exitFocusMode: 'Exit Focus Mode',
+    focusModeHint: 'Scroll and interact with the app freely. Tap "Exit Focus Mode" when done.',
 
     // Chatbot Section
     bonusFeature: 'BONUS FEATURE',
@@ -295,6 +298,9 @@ export const translations = {
 
     openInNewTab: 'Открыть на весь экран',
     poweredBy: 'Работает на GPT-4 и собственном NLU',
+    focusModeButton: 'Режим фокуса - Тестируйте без отвлечений',
+    exitFocusMode: 'Выйти из режима фокуса',
+    focusModeHint: 'Прокручивайте и взаимодействуйте с приложением свободно. Нажмите "Выйти из режима фокуса" когда закончите.',
 
     // Chatbot Section
     bonusFeature: 'БОНУС',
@@ -378,9 +384,9 @@ export const translations = {
     liveDemoBadge: 'Jonli Demo',
     heroTitle: 'Tanishing:',
     heroTitleHighlight: 'YAGO',
-    heroSubtitle: 'Sizning AI-quvvatli shaxsiy konsyerjingiz',
+    heroSubtitle: 'Sizning AI shaxsiy konsyerjingiz',
     heroPitch: 'Bitta suhbat. Nol muammo. YAGO hayotingizni osonlashtiradi.',
-    heroFeature1: '🏥 Shifokorga yozilish kerakmi? YAGO eng yaxshi mutaxassisni topadi va sizni yozadi',
+    heroFeature1: '🏥 Shifokorga yozilish kerakmi? YAGO eng yaxshi mutaxassisni topadi va sizni qabuliga yozadi',
     heroFeature2: '🚗 Mashina buzildi? YAGO yaqin avtoservisni topadi, narxlarni solishtiradi va evakuator chaqiradi',
     heroFeature3: '🛒 Oziq-ovqat kerakmi? YAGO sevimli do\'koningizdan buyurtma beradi va yetkazishni kuzatadi',
     heroFeature4: '✈️ Sayohat rejalashtirmoqdamisiz? YAGO aviabilet, mehmonxona bron qiladi va marshrutingizni tuzadi',
@@ -393,7 +399,7 @@ export const translations = {
     videoSubtitle: 'YAGO qanday ishlashini ko\'ring',
     videoComingSoon: 'Video tez orada',
     videoComingSoonDesc: 'Demo videomiz tayyorlanmoqda. Tez orada tekshiring!',
-    videoDuration: 'Davomiyligi: 3-4 daqiqa | 2024 yil dekabr oyida yozilgan',
+    videoDuration: 'Tez orada chiqariladi',
 
     // Description Section
     descriptionTitle: 'YAGO qanday ishlaydi?!',
@@ -479,6 +485,9 @@ export const translations = {
 
     openInNewTab: 'To\'liq ekranda ochish',
     poweredBy: 'GPT-4 va maxsus NLU asosida ishlaydi',
+    focusModeButton: 'Fokus rejimi - Chalg\'imasdan sinab ko\'ring',
+    exitFocusMode: 'Fokus rejimidan chiqish',
+    focusModeHint: 'Ilova ichida erkin aylaning va o\'zaro ta\'sir qiling. Tugatgandan so\'ng "Fokus rejimidan chiqish" tugmasini bosing.',
 
     // Chatbot Section
     bonusFeature: 'BONUS',

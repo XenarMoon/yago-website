@@ -96,63 +96,23 @@ export default function DemoPage() {
 
 function LanguageSelector() {
   const { lang, setLang } = useTranslation();
-  const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
   const languages: Language[] = ['en', 'ru', 'uz'];
 
   return (
-    <div className="relative" ref={dropdownRef}>
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 py-1.5 bg-white/10 hover:bg-white/20 rounded-lg border border-white/20 transition-colors"
-      >
-        <span className="text-lg">{languageFlags[lang]}</span>
-        <span className="text-white text-sm font-medium">{lang.toUpperCase()}</span>
-        <svg
-          className={`w-4 h-4 text-white/70 transition-transform ${isOpen ? 'rotate-180' : ''}`}
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
+    <div className="flex items-center bg-white/5 backdrop-blur-sm rounded-full p-1 border border-white/10">
+      {languages.map((l) => (
+        <button
+          key={l}
+          onClick={() => setLang(l)}
+          className={`relative px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 ${
+            lang === l
+              ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/30'
+              : 'text-white/60 hover:text-white hover:bg-white/10'
+          }`}
         >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-        </svg>
-      </button>
-
-      {isOpen && (
-        <div className="absolute right-0 mt-2 w-40 bg-slate-800 border border-white/10 rounded-xl shadow-xl overflow-hidden z-50">
-          {languages.map((l) => (
-            <button
-              key={l}
-              onClick={() => {
-                setLang(l);
-                setIsOpen(false);
-              }}
-              className={`w-full flex items-center gap-3 px-4 py-2.5 text-left hover:bg-white/10 transition-colors ${
-                lang === l ? 'bg-purple-500/20 text-purple-300' : 'text-white/80'
-              }`}
-            >
-              <span className="text-lg">{languageFlags[l]}</span>
-              <span className="text-sm">{languageNames[l]}</span>
-              {lang === l && (
-                <svg className="w-4 h-4 ml-auto text-purple-400" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                </svg>
-              )}
-            </button>
-          ))}
-        </div>
-      )}
+          {l.toUpperCase()}
+        </button>
+      ))}
     </div>
   );
 }
@@ -390,10 +350,23 @@ function DescriptionSection() {
 function LiveDemoSection() {
   const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(true);
+  const [isFocusMode, setIsFocusMode] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const iframeUrl = `${CONFIG.LIVE_APP_URL}?ngrok-skip-browser-warning=true`;
 
   const handleIframeLoad = () => setIsLoading(false);
+
+  // Lock body scroll when focus mode is active
+  useEffect(() => {
+    if (isFocusMode) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isFocusMode]);
 
   return (
     <section id="live-demo" className="px-4 py-16">
@@ -439,7 +412,7 @@ function LiveDemoSection() {
             <div className="relative bg-black rounded-[3rem] p-3 shadow-2xl shadow-purple-500/20">
               <div className="relative bg-black rounded-[2.5rem] overflow-hidden">
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-7 bg-black rounded-b-2xl z-20" />
-                <div className="relative w-[300px] h-[600px] sm:w-[340px] sm:h-[680px] bg-slate-900 overflow-hidden">
+                <div className="relative w-[320px] h-[640px] sm:w-[360px] sm:h-[720px] lg:w-[380px] lg:h-[760px] bg-slate-900 overflow-hidden">
                   {isLoading && (
                     <div className="absolute inset-0 flex items-center justify-center bg-slate-900 z-10">
                       <div className="text-center">
@@ -460,8 +433,54 @@ function LiveDemoSection() {
               </div>
             </div>
             <div className="absolute -z-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-purple-500/20 rounded-full blur-3xl" />
+
+            {/* Focus Mode Button - Mobile Only */}
+            <button
+              onClick={() => setIsFocusMode(true)}
+              className="lg:hidden mt-4 w-full flex items-center justify-center gap-2 px-4 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-medium rounded-xl transition-colors"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+              </svg>
+              {t.focusModeButton || 'Focus Mode - Test Without Distractions'}
+            </button>
             </div>
           </div>
+
+          {/* Focus Mode Overlay */}
+          {isFocusMode && (
+            <div className="fixed inset-0 z-50 bg-black flex flex-col items-center justify-center p-4">
+              {/* Close Button */}
+              <button
+                onClick={() => setIsFocusMode(false)}
+                className="absolute top-4 right-4 flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+                {t.exitFocusMode || 'Exit Focus Mode'}
+              </button>
+
+              {/* Fullscreen Phone Frame */}
+              <div className="relative bg-black rounded-[2rem] p-2 shadow-2xl max-h-[90vh]">
+                <div className="relative bg-black rounded-[1.5rem] overflow-hidden">
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-5 bg-black rounded-b-xl z-20" />
+                  <div className="relative w-[90vw] max-w-[400px] h-[80vh] max-h-[800px] bg-slate-900 overflow-hidden">
+                    <iframe
+                      src={iframeUrl}
+                      className="w-full h-full border-0"
+                      allow="microphone; camera; clipboard-write"
+                      title="YAGO Live Demo - Focus Mode"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <p className="mt-4 text-white/50 text-sm text-center">
+                {t.focusModeHint || 'Scroll and interact with the app freely. Tap "Exit Focus Mode" when done.'}
+              </p>
+            </div>
+          )}
 
           {/* Instructions Panel - Right Side */}
           <div className="flex-1 max-w-xl space-y-5">
