@@ -45,3 +45,20 @@ html {
 ::-webkit-scrollbar-thumb:hover {
   background: #D97706;
 }
+
+/* Demo page - use standard cursor */
+.demo-page,
+.demo-page * {
+  cursor: auto !important;
+}
+
+.demo-page a,
+.demo-page button,
+.demo-page [role="button"] {
+  cursor: pointer !important;
+}
+
+.demo-page input,
+.demo-page textarea {
+  cursor: text !important;
+}

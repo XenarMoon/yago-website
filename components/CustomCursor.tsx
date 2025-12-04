@@ -1,9 +1,11 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
 
 export default function CustomCursor() {
+  const pathname = usePathname();
   const mousePosition = useRef({ x: 0, y: 0 });
   const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
   const [isMounted, setIsMounted] = useState(false);
@@ -17,11 +19,16 @@ export default function CustomCursor() {
     size: number;
   }>>([]);
 
+  // Check if we should disable custom cursor (on demo page)
+  const isDisabled = pathname === '/demo';
+
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
   useEffect(() => {
+    if (isDisabled) return;
+
     const handleMouseMove = (e: MouseEvent) => {
       mousePosition.current = { x: e.clientX, y: e.clientY };
 
@@ -40,11 +47,11 @@ export default function CustomCursor() {
 
     window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
+  }, [isDisabled]);
 
   // Canvas particle system
   useEffect(() => {
-    if (!isMounted) return;
+    if (!isMounted || isDisabled) return;
 
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -111,9 +118,10 @@ export default function CustomCursor() {
       cancelAnimationFrame(animationFrame);
       window.removeEventListener('resize', resize);
     };
-  }, [isMounted]);
+  }, [isMounted, isDisabled]);
 
-  if (!isMounted) return null;
+  // Don't render anything on demo page or before mount
+  if (!isMounted || isDisabled) return null;
 
   return (
     <>
