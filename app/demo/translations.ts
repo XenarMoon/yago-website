@@ -96,10 +96,10 @@ export const translations = {
 
     // Try These Commands
     tryTheseCommands: 'Try These Commands',
-    command1: '"Book a table for 2 at an Italian restaurant tonight"',
-    command2: '"Find me a dentist appointment tomorrow"',
-    command3: '"Order groceries from the nearest supermarket"',
-    command4: '"I need a plumber urgently"',
+    command1: '"I want to make a doctor appointment for tomorrow morning at 9am"',
+    command2: '"Order food from the nearest restaurant"',
+    command3: '"Book a taxi to the airport for 3pm"',
+    command4: '"I need grocery delivery from the supermarket"',
 
     // Tips
     tipsTitle: 'Pro Tips',
@@ -185,7 +185,7 @@ export const translations = {
 
     // Footer
     footerCompetition: 'AI500 Competition - Stage 2',
-    footerRights: '© 2024 YAGO. All rights reserved.',
+    footerRights: '© 2025 YAGO. All rights reserved.',
   },
 
   ru: {
@@ -283,10 +283,10 @@ export const translations = {
 
     // Try These Commands
     tryTheseCommands: 'Попробуйте эти команды',
-    command1: '"Забронируй столик на 2 в итальянском ресторане на сегодня"',
-    command2: '"Запиши меня к стоматологу на завтра"',
-    command3: '"Закажи продукты из ближайшего супермаркета"',
-    command4: '"Мне срочно нужен сантехник"',
+    command1: '"Хочу записаться к врачу на завтра утром в 9 часов"',
+    command2: '"Закажи еду из ближайшего ресторана"',
+    command3: '"Забронируй такси в аэропорт на 15:00"',
+    command4: '"Мне нужна доставка продуктов из супермаркета"',
 
     // Tips
     tipsTitle: 'Советы',
@@ -372,7 +372,7 @@ export const translations = {
 
     // Footer
     footerCompetition: 'AI500 Конкурс - Этап 2',
-    footerRights: '© 2024 YAGO. Все права защищены.',
+    footerRights: '© 2025 YAGO. Все права защищены.',
   },
 
   uz: {
@@ -381,22 +381,22 @@ export const translations = {
     backToHome: 'Bosh sahifa',
 
     // Hero
-    liveDemoBadge: 'Jonli Demo',
+    liveDemoBadge: 'Demo',
     heroTitle: 'Tanishing:',
     heroTitleHighlight: 'YAGO',
-    heroSubtitle: 'Sizning AI shaxsiy konsyerjingiz',
+    heroSubtitle: 'Sizning shaxsiy AI konsyerjingiz',
     heroPitch: 'Bitta suhbat. Nol muammo. YAGO hayotingizni osonlashtiradi.',
     heroFeature1: '🏥 Shifokorga yozilish kerakmi? YAGO eng yaxshi mutaxassisni topadi va sizni qabuliga yozadi',
     heroFeature2: '🚗 Mashina buzildi? YAGO yaqin avtoservisni topadi, narxlarni solishtiradi va evakuator chaqiradi',
-    heroFeature3: '🛒 Oziq-ovqat kerakmi? YAGO sevimli do\'koningizdan buyurtma beradi va yetkazishni kuzatadi',
-    heroFeature4: '✈️ Sayohat rejalashtirmoqdamisiz? YAGO aviabilet, mehmonxona bron qiladi va marshrutingizni tuzadi',
+    heroFeature3: '🛒 Oziq-ovqat kerakmi? YAGO sevimli do\'koningizdan buyurtma beradi va yetkazishni ta\'minlaydi',
+    heroFeature4: '✈️ Sayohat rejalashtirasizmi? YAGO aviabilet, mehmonxona bron qiladi va marshrutingizni tuzadi',
     heroFeature5: '🍽️ Kechki ovqat istaysizmi? YAGO eng zo\'r restoranda stol band qiladi',
     heroFeature6: '🔧 Uyda favqulodda holat? YAGO santexnik, elektrik topadi va tez yordam yuboradi',
     heroTagline: 'Telegram, Web va iOS\'da mavjud',
 
     // Video Section
     videoTitle: 'Demo Video',
-    videoSubtitle: 'YAGO qanday ishlashini ko\'ring',
+    videoSubtitle: 'YAGO Ekosistemasi qanday ishlashini ko\'ring',
     videoComingSoon: 'Video tez orada',
     videoComingSoonDesc: 'Demo videomiz tayyorlanmoqda. Tez orada tekshiring!',
     videoDuration: 'Tez orada chiqariladi',
@@ -407,11 +407,11 @@ export const translations = {
 
     // What's Being Shown
     whatShownTitle: 'YAGO super kuchlari',
-    whatShown1: '🧠 Tabiiy tilni tushunadi — do\'stingiz bilan gaplashgandek gapiring',
-    whatShown2: '⚡ Bir zumda harakat — soniyalarda bron qiladi, buyurtma beradi, chaqiradi',
+    whatShown1: '🧠 Tabiiy tilni tushunadi — do\'stingiz bilan gaplashgandek gaplashing',
+    whatShown2: '⚡ Bir zumda harakat — tez bron qiladi, buyurtma beradi, kerakli servisni chaqiradi',
     whatShown3: '🔄 Hammasini eslab qoladi — afzalliklaringiz, oldingi buyurtmalar, sevimli joylar',
     whatShown4: '🌐 Hamma joyda ishlaydi — Telegram, iOS, Web — hammasi sinxronlashgan',
-    whatShown5: '🤝 Siz uchun savdolashadi — eng yaxshi narxlarni topadi, solishtirad, chegirmalar oladi',
+    whatShown5: '🤝 Siz uchun savdolashadi — eng yaxshi narxlarni topadi, solishtiradi, chegirmalar oladi',
     whatShown6: '📍 Joylashuvni biladi — yaqinda nima bor va hozir nima mavjud',
 
     // Problem & Solution
@@ -447,7 +447,7 @@ export const translations = {
     stageLaunched: 'Ishga tushirilgan',
     nextStepsTitle: 'Keyingi qadamlar:',
     nextStep1: 'To\'lov integratsiyasi va bron tasdiqlash',
-    nextStep2: 'Hamkorlarni ulash (restoranlar, xizmatlar)',
+    nextStep2: 'Hamkorlarni ulash (restoranlar, shifoxonalar va 100+ xizmatlar)',
     nextStep3: 'O\'zbekistonda ommaviy beta-ishga tushirish',
     nextStep4: 'Android ilovasini chiqarish',
 
@@ -470,18 +470,18 @@ export const translations = {
 
     // Try These Commands
     tryTheseCommands: 'Bu buyruqlarni sinab ko\'ring',
-    command1: '"Bugun kechqurun italyan restoranida 2 kishi uchun stol bron qil"',
-    command2: '"Ertaga tish shifokoriga yozil"',
-    command3: '"Eng yaqin supermarketdan oziq-ovqat buyurtma qil"',
-    command4: '"Menga zudlik bilan santexnik kerak"',
+    command1: '"Ertaga ertalab soat 9 da shifokorga yozilmoqchiman"',
+    command2: '"Eng yaqin restorandan ovqat buyurtma qil"',
+    command3: '"Soat 15:00 ga aeroportga taksi bron qil"',
+    command4: '"Supermarketdan oziq-ovqat yetkazib berish kerak"',
 
     // Tips
     tipsTitle: 'Maslahatlar',
-    tip1: 'Aniq bo\'ling — vaqt, joy, afzalliklarni ayting',
-    tip2: 'Qo\'shimcha savollar bering — YAGO kontekstni eslab qoladi',
+    tip1: 'Kerakli ma\'lumotlar — vaqt, joy, afzalliklarni ayting',
+    tip2: 'Qo\'shimcha savollar berish — YAGO kontekstni eslab qoladi',
     tip3: 'Turli xizmatlarni sinab ko\'ring — restoranlar, shifokorlar, sayohat',
     demoNoticeTitle: 'Eslatma',
-    demoNoticeText: 'YAGO javoblari sekinroq bo\'lishi mumkin, chunki test uchun mahalliy kompyuter server sifatida ishlatilmoqda. Ba\'zi funksiyalar veb formatida mavjud bo\'lmasligi mumkin (masalan, ovozli xabarlar), lekin ularni YAGO Telegram botida sinab ko\'rishingiz mumkin.',
+    demoNoticeText: 'YAGO javoblari sekinroq bo\'lishi mumkin, chunki test uchun mahalliy kompyuter server sifatida ishlatilmoqda. Ba\'zi funksiyalar web formatida mavjud bo\'lmasligi mumkin (masalan, ovozli xabarlar va lokatsiya), lekin ularni YAGO Telegram botida sinab ko\'rishingiz mumkin.',
 
     openInNewTab: 'To\'liq ekranda ochish',
     poweredBy: 'GPT-4 va maxsus NLU asosida ishlaydi',
@@ -559,7 +559,7 @@ export const translations = {
 
     // Footer
     footerCompetition: 'AI500 Musobaqa - Bosqich 2',
-    footerRights: '© 2024 YAGO. Barcha huquqlar himoyalangan.',
+    footerRights: '© 2025 YAGO. Barcha huquqlar himoyalangan.',
   },
 };
 

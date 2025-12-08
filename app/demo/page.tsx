@@ -41,7 +41,7 @@ interface ApiResponse {
 // =============================================================================
 
 const CONFIG = {
-  DEMO_VIDEO_ID: 'YOUR_YOUTUBE_VIDEO_ID',
+  DEMO_VIDEO_ID: '3vpxdXjd8L8',
   LIVE_APP_URL: 'https://yago-ios.ngrok-free.dev',
   BACKEND_URL: 'https://backendyago.ngrok.app',
   TEST_CREDENTIALS: {
@@ -210,7 +210,6 @@ function HeroSection() {
 
 function VideoSection() {
   const { t } = useTranslation();
-  const [videoError, setVideoError] = useState(false);
 
   return (
     <section id="video" className="px-4 py-16">
@@ -221,26 +220,13 @@ function VideoSection() {
         </div>
 
         <div className="relative aspect-video bg-slate-800 rounded-2xl overflow-hidden shadow-2xl shadow-purple-500/10 border border-white/10">
-          {CONFIG.DEMO_VIDEO_ID && CONFIG.DEMO_VIDEO_ID !== 'YOUR_YOUTUBE_VIDEO_ID' && !videoError ? (
-            <iframe
-              src={`https://www.youtube.com/embed/${CONFIG.DEMO_VIDEO_ID}?rel=0&modestbranding=1`}
-              className="absolute inset-0 w-full h-full"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              title="YAGO Demo Video"
-              onError={() => setVideoError(true)}
-            />
-          ) : (
-            <div className="absolute inset-0 flex flex-col items-center justify-center p-8">
-              <div className="w-20 h-20 mb-6 rounded-full bg-purple-500/20 flex items-center justify-center">
-                <svg className="w-10 h-10 text-purple-400" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M8 5v14l11-7z" />
-                </svg>
-              </div>
-              <h3 className="text-white font-semibold text-xl mb-2">{t.videoComingSoon}</h3>
-              <p className="text-white/60 text-center max-w-md">{t.videoComingSoonDesc}</p>
-            </div>
-          )}
+          <iframe
+            src={`https://www.youtube.com/embed/${CONFIG.DEMO_VIDEO_ID}?rel=0&modestbranding=1`}
+            className="absolute inset-0 w-full h-full"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+            title="YAGO Demo Video"
+          />
         </div>
 
         <p className="text-center text-white/40 text-sm mt-4">{t.videoDuration}</p>
@@ -409,12 +395,12 @@ function LiveDemoSection() {
 
             {/* Phone Frame */}
             <div className="relative">
-            <div className="relative bg-black rounded-[3rem] p-3 shadow-2xl shadow-purple-500/20">
+            <div className="relative bg-black rounded-[3rem] p-2 shadow-2xl shadow-purple-500/20">
               <div className="relative bg-black rounded-[2.5rem] overflow-hidden">
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-7 bg-black rounded-b-2xl z-20" />
-                <div className="relative w-[320px] h-[640px] sm:w-[360px] sm:h-[720px] lg:w-[380px] lg:h-[760px] bg-slate-900 overflow-hidden">
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-28 h-6 bg-black rounded-b-2xl z-20" />
+                <div className="relative w-[300px] h-[620px] sm:w-[340px] sm:h-[700px] lg:w-[360px] lg:h-[740px] bg-black overflow-hidden">
                   {isLoading && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-slate-900 z-10">
+                    <div className="absolute inset-0 flex items-center justify-center bg-black z-10">
                       <div className="text-center">
                         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500 mb-4 mx-auto" />
                         <p className="text-white/60 text-sm">{t.loadingApp}</p>
@@ -424,7 +410,7 @@ function LiveDemoSection() {
                   <iframe
                     ref={iframeRef}
                     src={iframeUrl}
-                    className="w-full h-full border-0"
+                    className="absolute inset-0 w-full h-full border-0"
                     allow="microphone; camera; clipboard-write"
                     title="YAGO Live Demo"
                     onLoad={handleIframeLoad}
@@ -523,22 +509,47 @@ function LiveDemoSection() {
                 <span className="text-2xl">💬</span> {t.tryTheseCommands}
               </h3>
               <ul className="space-y-3">
-                <li className="flex items-start gap-3 p-3 bg-white/5 rounded-xl hover:bg-white/10 transition-colors cursor-pointer">
-                  <span className="text-purple-400 font-bold">→</span>
-                  <span className="text-white/80 text-sm">{t.command1}</span>
-                </li>
-                <li className="flex items-start gap-3 p-3 bg-white/5 rounded-xl hover:bg-white/10 transition-colors cursor-pointer">
-                  <span className="text-purple-400 font-bold">→</span>
-                  <span className="text-white/80 text-sm">{t.command2}</span>
-                </li>
-                <li className="flex items-start gap-3 p-3 bg-white/5 rounded-xl hover:bg-white/10 transition-colors cursor-pointer">
-                  <span className="text-purple-400 font-bold">→</span>
-                  <span className="text-white/80 text-sm">{t.command3}</span>
-                </li>
-                <li className="flex items-start gap-3 p-3 bg-white/5 rounded-xl hover:bg-white/10 transition-colors cursor-pointer">
-                  <span className="text-purple-400 font-bold">→</span>
-                  <span className="text-white/80 text-sm">{t.command4}</span>
-                </li>
+                <CommandItem
+                  icon={
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center flex-shrink-0">
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                    </div>
+                  }
+                  command={t.command1}
+                />
+                <CommandItem
+                  icon={
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center flex-shrink-0">
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                      </svg>
+                    </div>
+                  }
+                  command={t.command2}
+                />
+                <CommandItem
+                  icon={
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center flex-shrink-0">
+                      <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"/>
+                      </svg>
+                    </div>
+                  }
+                  command={t.command3}
+                />
+                <CommandItem
+                  icon={
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center flex-shrink-0">
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                      </svg>
+                    </div>
+                  }
+                  command={t.command4}
+                />
               </ul>
             </div>
 
@@ -951,7 +962,10 @@ function Footer() {
           </div>
           <div className="flex items-center gap-6 text-sm text-white/40">
             <span>{t.footerRights}</span>
-            <a href="mailto:hello@tryyago.com" className="hover:text-white transition-colors">hello@tryyago.com</a>
+            <a href="https://t.me/officialyago" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors flex items-center gap-1">
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+              @officialyago
+            </a>
           </div>
         </div>
       </div>
@@ -997,6 +1011,44 @@ function CopyButton({ label, value }: { label: string; value: string }) {
         )}
       </div>
     </button>
+  );
+}
+
+function CommandItem({ icon, command }: { icon: React.ReactNode; command: string }) {
+  const [copied, setCopied] = useState(false);
+
+  // Remove quotes from command for copying
+  const cleanCommand = command.replace(/^"|"$/g, '');
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(cleanCommand);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy:', err);
+    }
+  };
+
+  return (
+    <li
+      onClick={handleCopy}
+      className="flex items-center gap-3 p-3 bg-white/5 rounded-xl hover:bg-white/10 transition-colors cursor-pointer group"
+    >
+      {icon}
+      <span className="text-white/80 text-sm flex-1">{command}</span>
+      <div className={`flex items-center justify-center w-8 h-8 rounded-md transition-all ${copied ? 'bg-emerald-500/20' : 'opacity-0 group-hover:opacity-100 bg-white/10'}`}>
+        {copied ? (
+          <svg className="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+          </svg>
+        ) : (
+          <svg className="w-4 h-4 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+          </svg>
+        )}
+      </div>
+    </li>
   );
 }
 
