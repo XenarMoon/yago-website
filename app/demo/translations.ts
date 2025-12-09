@@ -25,7 +25,7 @@ export const translations = {
     videoSubtitle: 'Watch how YAGO works in action',
     videoComingSoon: 'Demo Video Coming Soon',
     videoComingSoonDesc: 'Our demo video is being prepared. Check back shortly!',
-    videoDuration: 'Duration: 3-4 minutes | Recorded December 2024',
+    videoDuration: 'Duration: 2 minutes 45 seconds | Recorded December 2025',
 
     // Description Section
     descriptionTitle: 'See YAGO in Action',
@@ -212,7 +212,7 @@ export const translations = {
     videoSubtitle: 'Посмотрите, как работает YAGO',
     videoComingSoon: 'Видео скоро будет',
     videoComingSoonDesc: 'Наше демо-видео готовится. Загляните позже!',
-    videoDuration: 'Длительность: 3-4 минуты | Записано в декабре 2024',
+    videoDuration: 'Длительность: 2 минуты 45 секунд | Записано в декабре 2025',
 
     // Description Section
     descriptionTitle: 'YAGO в действии',
